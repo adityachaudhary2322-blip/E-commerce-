@@ -1,0 +1,79 @@
+[
+  {
+    "user_id": "guest_163c68a1",
+    "products": [
+      {
+        "id": "101",
+        "name": "Gaming Laptop",
+        "price": 90000.0,
+        "quantity": 1,
+        "image": "\ud83d\udcbb"
+      }
+    ],
+    "total_amount": 0
+  },
+  {
+    "user_id": "guest_b17d7d60",
+    "products": [],
+    "total_amount": 0
+  },
+  {
+    "user_id": "guest_d73b87e2",
+    "products": [
+      {
+        "id": "115",
+        "name": "iphone",
+        "price": 150000.0,
+        "quantity": 10,
+        "image": "\ud83d\udce6"
+      },
+      {
+        "id": "101",
+        "name": "Gaming Laptop",
+        "price": 90000.0,
+        "quantity": 1,
+        "image": "\ud83d\udcbb"
+      }
+    ],
+    "total_amount": 0
+  },
+  {
+    "user_id": "guest_3fc9f7b6",
+    "products": [
+      {
+        "id": "101",
+        "name": "Gaming Laptop",
+        "price": 90000.0,
+        "quantity": 1,
+        "image": "\ud83d\udcbb"
+      }
+    ],
+    "total_amount": 0
+  },
+  {
+    "user_id": "guest_eb1415c4",
+    "products": [
+      {
+        "id": "115",
+        "name": "iphone",
+        "price": 150000.0,
+        "quantity": 5,
+        "image": "\ud83d\udce6"
+      }
+    ],
+    "total_amount": 0
+  },
+  {
+    "user_id": "guest_c4a8dea3",
+    "products": [
+      {
+        "id": "101",
+        "name": "Gaming Laptop",
+        "price": 90000.0,
+        "quantity": 1,
+        "image": "\ud83d\udcbb"
+      }
+    ],
+    "total_amount": 0
+  }
+]

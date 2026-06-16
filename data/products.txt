@@ -1,0 +1,15 @@
+101|Laptop|89999.0|10|Electronics|None|None
+102|Mouse|1299.0|50|Electronics|None|None
+103|T-Shirt|999.0|100|Clothing|None|None
+104|Headphones|4999.0|30|Electronics|None|None
+105|Jeans|2499.0|40|Clothing|None|None
+106|Doraemon Plush Toy|1499.0|25|Toys|None|None
+107|Doraemon Gadget Watch|2999.0|15|Accessories|None|None
+108|Doraemon T-Shirt|1299.0|35|Clothing|None|None
+109|Pikachu Soft Toy|1999.0|20|Toys|None|None
+110|Pikachu Backpack|3499.0|12|Bags|None|None
+111|Pikachu Hoodie|3999.0|18|Clothing|None|None
+112|Niet_ECE_Bag|154499.0|10|Bags|None|None
+113|Dragon Ball Z Backpack|3999.0|15|Bags|None|None
+114|Anime Poster Set|999.0|50|Accessories|None|None
+115|Naruto Headband|499|60|Accessories|None|None

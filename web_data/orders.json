@@ -1,0 +1,26 @@
+[
+  {
+    "id": "ORD20260611174424",
+    "user_id": "guest_163c68a1",
+    "date": "2026-06-11 17:44:24",
+    "items": [
+      {
+        "id": "101",
+        "name": "Gaming Laptop",
+        "price": 89999,
+        "quantity": 1,
+        "image": "\ud83d\udcbb"
+      },
+      {
+        "id": "114",
+        "name": "ipad",
+        "price": 75000.0,
+        "quantity": 33,
+        "image": "\ud83d\udce6"
+      }
+    ],
+    "total": 2564999.0,
+    "payment_method": "UPI",
+    "status": "Confirmed"
+  }
+]

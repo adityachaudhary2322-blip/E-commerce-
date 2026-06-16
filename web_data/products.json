@@ -1,0 +1,116 @@
+[
+  {
+    "id": "101",
+    "name": "Gaming Laptop",
+    "price": 90000.0,
+    "stock": 10,
+    "category": "Electronics",
+    "image": "\ud83d\udcbb",
+    "product_id": "101"
+  },
+  {
+    "id": "102",
+    "name": "Wireless Mouse",
+    "price": 1299,
+    "stock": 50,
+    "category": "Electronics",
+    "image": "\ud83d\uddb1\ufe0f",
+    "product_id": "102"
+  },
+  {
+    "id": "103",
+    "name": "Cotton T-Shirt",
+    "price": 999,
+    "stock": 100,
+    "category": "Clothing",
+    "image": "\ud83d\udc55",
+    "product_id": "103"
+  },
+  {
+    "id": "106",
+    "name": "Doraemon Plush Toy",
+    "price": 1499,
+    "stock": 25,
+    "category": "Toys",
+    "image": "\ud83d\udc31",
+    "product_id": "106"
+  },
+  {
+    "id": "109",
+    "name": "Pikachu Soft Toy",
+    "price": 1999,
+    "stock": 20,
+    "category": "Toys",
+    "image": "\ud83d\udc2d",
+    "product_id": "109"
+  },
+  {
+    "id": "112",
+    "name": "Niet Anime Bag",
+    "price": 4499,
+    "stock": 10,
+    "category": "Bags",
+    "image": "\ud83c\udf92",
+    "product_id": "112"
+  },
+  {
+    "id": "113",
+    "name": "tablet",
+    "category": "Electronics",
+    "price": 45000.0,
+    "stock": 50,
+    "image": "\ud83d\udce6",
+    "product_id": "113"
+  },
+  {
+    "id": "114",
+    "name": "ipad",
+    "price": 75000.0,
+    "stock": 100,
+    "category": "Electronics",
+    "image": "\ud83d\udce6",
+    "product_id": "114"
+  },
+  {
+    "id": "115",
+    "name": "iphone",
+    "category": "Electronics",
+    "price": 150000.0,
+    "stock": 12,
+    "image": "\ud83d\udce6",
+    "product_id": "115"
+  },
+  {
+    "id": "116",
+    "name": "radio plane",
+    "category": "Toys",
+    "price": 750.0,
+    "stock": 50,
+    "image": "\ud83d\udce6",
+    "product_id": "116"
+  },
+  {
+    "id": "117",
+    "name": "bottle",
+    "price": 500.0,
+    "stock": 10,
+    "category": "homeware",
+    "image": "\ud83d\udce6"
+  },
+  {
+    "id": "118",
+    "name": "shoes",
+    "category": "general",
+    "price": 500.0,
+    "stock": 10,
+    "image": "\ud83d\udce6"
+  },
+  {
+    "id": "119",
+    "name": "BALL",
+    "category": "GAME",
+    "price": 1234.0,
+    "stock": 12,
+    "image": "\ud83d\udce6"
+  }
+]

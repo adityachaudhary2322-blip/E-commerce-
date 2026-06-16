@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopIndia - Anime & Electronics Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .product-card { transition: transform 0.2s, box-shadow 0.2s; scroll-margin-top: 80px; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+        .sidebar { transition: transform 0.3s ease; }
+        .cart-badge { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: white; padding: 12px 20px; border-radius: 8px; z-index: 1000; animation: slideIn 0.3s ease; }
+        .toast-success { background: #10b981; }
+        .toast-error { background: #ef4444; }
+        .toast-warning { background: #f59e0b; }
+        .loading { display: inline-block; width: 24px; height: 24px; border: 3px solid #e5e7eb; border-top-color: #4f46e5; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1100; animation: fadeIn 0.2s ease; }
+        .modal-content { background: white; border-radius: 16px; max-width: 500px; width: 90%; max-height: 85vh; overflow-y: auto; animation: slideUp 0.3s ease; padding: 24px; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .track-step { position: relative; padding-bottom: 30px; }
+        .track-step:last-child { padding-bottom: 0; }
+        .track-line { position: absolute; left: 20px; top: 40px; bottom: 0; width: 2px; background: #e5e7eb; }
+        .track-step.completed .track-line { background: #10b981; }
+        .track-dot { width: 40px; height: 40px; background: #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 1; position: relative; }
+        .track-step.completed .track-dot { background: #10b981; color: white; }
+        .track-step.active .track-dot { background: #4f46e5; color: white; box-shadow: 0 0 0 4px rgba(79,70,229,0.2); }
+        .address-card { transition: all 0.2s; cursor: pointer; }
+        .address-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .address-card.selected { border-color: #4f46e5; background: #eef2ff; }
+        .status-badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-paid { background: #10b98120; color: #10b981; }
+        .status-unpaid { background: #f59e0b20; color: #f59e0b; }
+        .status-processing { background: #3b82f620; color: #3b82f6; }
+        .status-delivered { background: #8b5cf620; color: #8b5cf6; }
+        .status-cancelled { background: #ef444420; color: #ef4444; }
+        .confirm-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1200; }
+        .confirm-content { background: white; border-radius: 16px; max-width: 400px; width: 90%; padding: 24px; text-align: center; }
+        .admin-section { background: #fef3c7; border: 1px solid #fbbf24; border-radius: 12px; padding: 20px; margin-top: 40px; }
+        .admin-section h3 { color: #92400e; font-weight: bold; margin-bottom: 15px; }
+        .admin-input { border: 1px solid #d1d5db; border-radius: 8px; padding: 8px 12px; width: 100%; }
+        .admin-btn { background: #d97706; color: white; padding: 8px 16px; border-radius: 8px; font-weight: 500; cursor: pointer; }
+        .admin-btn:hover { background: #b45309; }
+        .admin-table { width: 100%; font-size: 14px; }
+        .admin-table th, .admin-table td { padding: 8px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        .admin-login-form { background: #fef3c7; border: 1px solid #fbbf24; border-radius: 12px; padding: 20px; margin-top: 40px; text-align: center; }
+        .admin-login-input { border: 1px solid #d1d5db; border-radius: 8px; padding: 8px 12px; width: 200px; margin: 5px; }
+        .admin-login-btn { background: #d97706; color: white; padding: 8px 20px; border-radius: 8px; cursor: pointer; }
+        .admin-login-btn:hover { background: #b45309; }
+        .admin-logout-btn { background: #dc2626; color: white; padding: 4px 12px; border-radius: 6px; font-size: 12px; margin-left: 10px; cursor: pointer; }
+        .quantity-selector { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+        .quantity-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #d1d5db; background: white; cursor: pointer; font-weight: bold; }
+        .quantity-btn:hover { background: #f3f4f6; }
+        .quantity-input { width: 50px; text-align: center; border: 1px solid #d1d5db; border-radius: 6px; padding: 4px; }
+        .out-of-stock { opacity: 0.6; background: #f3f4f6; cursor: not-allowed; }
+        .low-stock { color: #f59e0b; font-weight: 500; }
+        .scroll-top-btn { position: fixed; bottom: 80px; right: 20px; background: #4f46e5; color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); transition: all 0.3s; }
+        .scroll-top-btn:hover { background: #4338ca; transform: scale(1.1); }
+        @media print {
+            body * { visibility: hidden; }
+            .receipt-print-area, .receipt-print-area * { visibility: visible; }
+            .receipt-print-area { position: absolute; top: 0; left: 0; width: 100%; margin: 0; padding: 20px; background: white; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<div id="app" class="flex min-h-screen">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar fixed left-0 top-0 h-full w-64 bg-white shadow-lg z-50 transform -translate-x-full md:translate-x-0 transition-all">
+        <div class="p-5">
+            <div class="flex items-center gap-2 mb-8">
+                <span class="text-2xl font-bold text-indigo-600">ShopIndia</span>
+            </div>
+            <nav class="space-y-1">
+                <a href="#" onclick="navigateTo('dashboard')" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all">
+                    <span class="material-symbols-outlined">dashboard</span><span>Dashboard</span>
+                </a>
+                <a href="#" onclick="navigateTo('products')" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all">
+                    <span class="material-symbols-outlined">shopping_bag</span><span>Products</span>
+                </a>
+                <a href="#" onclick="navigateTo('cart')" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all">
+                    <span class="material-symbols-outlined">shopping_cart</span><span>Cart</span>
+                    <span id="cartCountSidebar" class="ml-auto text-xs bg-red-500 text-white px-1.5 py-0.5 rounded-full hidden">0</span>
+                </a>
+                <a href="#" onclick="navigateTo('wishlist')" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all">
+                    <span class="material-symbols-outlined">favorite</span><span>Wishlist</span>
+                </a>
+                <a href="#" onclick="navigateTo('orders')" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all">
+                    <span class="material-symbols-outlined">receipt_long</span><span>Orders</span>
+                </a>
+                <a href="#" onclick="navigateTo('addresses')" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all">
+                    <span class="material-symbols-outlined">location_on</span><span>Addresses</span>
+                </a>
+                <a href="#" onclick="navigateTo('profile')" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all">
+                    <span class="material-symbols-outlined">person</span><span>Profile</span>
+                </a>
+            </nav>
+            <div class="absolute bottom-5 left-5 right-5">
+                <div class="p-4 bg-indigo-50 rounded-lg">
+                    <p class="text-sm font-medium text-indigo-600">All prices in ₹</p>
+                    <p class="text-xs text-gray-500 mt-1">Free shipping on orders above ₹999</p>
+                    <p class="text-xs text-gray-500 mt-2">Admin: Scroll to bottom of Products page</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 md:ml-64">
+        <header class="bg-white shadow-sm sticky top-0 z-40">
+            <div class="flex items-center justify-between px-4 md:px-6 py-3">
+                <button onclick="toggleSidebar()" class="md:hidden p-2 rounded-lg hover:bg-gray-100">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="flex-1 max-w-md mx-4">
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg">search</span>
+                        <input type="text" id="searchInput" placeholder="Search products..." class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-indigo-400">
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="relative cursor-pointer" onclick="navigateTo('cart')">
+                        <span class="material-symbols-outlined text-gray-600">shopping_cart</span>
+                        <span id="cartCountHeader" class="cart-badge hidden">0</span>
+                    </div>
+                    <div class="relative cursor-pointer" onclick="navigateTo('wishlist')">
+                        <span class="material-symbols-outlined text-gray-600">favorite</span>
+                    </div>
+                    <div id="userMenuBtn" class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center cursor-pointer hover:bg-indigo-200 transition" onclick="toggleUserMenu()">
+                        <span class="material-symbols-outlined text-indigo-600 text-sm">person</span>
+                    </div>
+                    <button onclick="refreshPage()" class="p-2 rounded-lg hover:bg-gray-100" title="Refresh">
+                        <span class="material-symbols-outlined text-gray-600">refresh</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <div id="pageContent" class="p-4 md:p-6">
+            <div class="text-center py-20">
+                <div class="loading"></div>
+                <p class="mt-4 text-gray-500">Loading...</p>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Scroll to Top Button -->
+<div onclick="scrollToTop()" class="scroll-top-btn no-print">
+    <span class="material-symbols-outlined">keyboard_arrow_up</span>
+</div>
+
+<!-- User Menu Dropdown -->
+<div id="userMenu" class="hidden fixed right-4 top-16 w-64 bg-white rounded-xl shadow-lg border border-gray-100 z-50">
+    <div class="p-4 border-b border-gray-100">
+        <p id="userNameDisplay" class="font-semibold">Guest User</p>
+        <p id="userEmailDisplay" class="text-sm text-gray-500">Not logged in</p>
+    </div>
+    <div class="p-2">
+        <button onclick="showLoginModal()" id="loginMenuItem" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-indigo-50 rounded-lg transition">Login</button>
+        <button onclick="showRegisterModal()" id="registerMenuItem" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-indigo-50 rounded-lg transition">Register</button>
+        <button onclick="logout()" id="logoutMenuItem" class="hidden w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition">Logout</button>
+    </div>
+</div>
+
+<script>
+    // ==================== DATA STORAGE KEYS ====================
+    const STORAGE_KEYS = {
+        USERS: 'ecommerce_users',
+        CURRENT_USER: 'ecommerce_current_user',
+        ADDRESSES: 'ecommerce_addresses'
+    };
+    
+    // ==================== GLOBAL VARIABLES ====================
+    let currentUser = null;
+    let products = [];
+    let cart = [];
+    let wishlist = [];
+    let orders = [];
+    let addresses = [];
+    let selectedAddressId = null;
+    let currentPage = 'products';
+    let adminLoggedIn = false;
+    
+    // Admin Credentials
+    const ADMIN_USERNAME = "admin_adi";
+    const ADMIN_PASSWORD = "12345";
+    
+    // ==================== ADMIN AUTHENTICATION ====================
+    function checkAdminLogin() {
+        let saved = localStorage.getItem('admin_logged_in');
+        if (saved === 'true') {
+            adminLoggedIn = true;
+        }
+        return adminLoggedIn;
+    }
+    
+    function adminLogin() {
+        let username = document.getElementById('adminUsername').value;
+        let password = document.getElementById('adminPassword').value;
+        
+        if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+            adminLoggedIn = true;
+            localStorage.setItem('admin_logged_in', 'true');
+            showToast('Admin login successful!', 'success');
+            renderCurrentPage();
+        } else {
+            showToast('Invalid admin credentials!', 'error');
+        }
+    }
+    
+    function adminLogout() {
+        adminLoggedIn = false;
+        localStorage.removeItem('admin_logged_in');
+        showToast('Admin logged out', 'warning');
+        renderCurrentPage();
+    }
+    
+    // ==================== API CALLS ====================
+    async function loadProducts() {
+        try {
+            const response = await fetch('/api/products?_=' + Date.now());
+            products = await response.json();
+            return products;
+        } catch (error) {
+            console.error('Error loading products:', error);
+            return [];
+        }
+    }
+    
+    async function loadCart() {
+        try {
+            const response = await fetch('/api/cart');
+            const data = await response.json();
+            cart = data.products || [];
+            updateCartCount();
+            return cart;
+        } catch (error) {
+            console.error('Error loading cart:', error);
+            return [];
+        }
+    }
+    
+    async function loadOrders() {
+        try {
+            const response = await fetch('/api/orders');
+            orders = await response.json();
+            return orders;
+        } catch (error) {
+            console.error('Error loading orders:', error);
+            return [];
+        }
+    }
+    
+    async function addToCart(productId, quantity) {
+        let product = products.find(p => p.id === productId);
+        if (!product) { showToast('Product not found', 'error'); return false; }
+        
+        if (product.stock <= 0) {
+            showToast(`Sorry, ${product.name} is out of stock!`, 'error');
+            return false;
+        }
+        
+        if (product.stock < quantity) {
+            showToast(`Only ${product.stock} items of ${product.name} available!`, 'warning');
+            return false;
+        }
+        
+        try {
+            const response = await fetch('/api/add-to-cart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_id: productId, quantity: quantity })
+            });
+            const result = await response.json();
+            if (result.success) {
+                await loadCart();
+                showToast(`Added ${quantity}x ${product.name} to cart!`, 'success');
+                return true;
+            } else {
+                showToast(result.error || 'Failed to add', 'error');
+                return false;
+            }
+        } catch (error) {
+            showToast('Error adding to cart', 'error');
+            return false;
+        }
+    }
+    
+    async function updateCartQuantity(productId, quantity) {
+        try {
+            const response = await fetch('/api/update-cart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_id: productId, quantity: quantity })
+            });
+            const result = await response.json();
+            if (result.success) {
+                await loadCart();
+                renderCurrentPage();
+                return true;
+            }
+            return false;
+        } catch (error) {
+            return false;
+        }
+    }
+    
+    async function placeOrderAPI(paymentMethod, address) {
+        try {
+            const response = await fetch('/api/place-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    payment_method: paymentMethod,
+                    shipping_address: address
+                })
+            });
+            const result = await response.json();
+            if (result.success) {
+                await loadCart();
+                await loadOrders();
+                showToast(`Order placed! ID: ${result.order_id}`, 'success');
+                return result.order_id;
+            } else {
+                showToast(result.error || 'Order failed', 'error');
+                return null;
+            }
+        } catch (error) {
+            showToast('Error placing order', 'error');
+            return null;
+        }
+    }
+    
+    // ==================== ADMIN API CALLS ====================
+    async function addProductAPI(name, price, stock, category) {
+        try {
+            const response = await fetch('/api/admin/add-product', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, price, stock, category })
+            });
+            const result = await response.json();
+            if (result.success) {
+                await loadProducts();
+                showToast(`Product "${name}" added`, 'success');
+                renderCurrentPage();
+                return true;
+            } else {
+                showToast(result.error || 'Failed to add', 'error');
+                return false;
+            }
+        } catch (error) {
+            showToast('Error adding product', 'error');
+            return false;
+        }
+    }
+    
+    async function updateProductAPI(productId, stock, price) {
+        try {
+            const response = await fetch(`/api/admin/update-product/${productId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ stock: stock, price: price })
+            });
+            const result = await response.json();
+            if (result.success) {
+                await loadProducts();
+                showToast(`Product updated`, 'success');
+                renderCurrentPage();
+                return true;
+            } else {
+                showToast(result.error || 'Failed to update', 'error');
+                return false;
+            }
+        } catch (error) {
+            showToast('Error updating product', 'error');
+            return false;
+        }
+    }
+    
+    async function deleteProductAPI(productId) {
+        try {
+            const response = await fetch(`/api/admin/delete-product/${productId}`, {
+                method: 'DELETE'
+            });
+            const result = await response.json();
+            if (result.success) {
+                await loadProducts();
+                showToast('Product deleted', 'success');
+                renderCurrentPage();
+                return true;
+            } else {
+                showToast('Failed to delete', 'error');
+                return false;
+            }
+        } catch (error) {
+            showToast('Error deleting product', 'error');
+            return false;
+        }
+    }
+    
+    // ==================== USER AUTHENTICATION ====================
+    function loadUserData() {
+        let userId = currentUser ? currentUser.email : 'guest';
+        let allAddresses = JSON.parse(localStorage.getItem(STORAGE_KEYS.ADDRESSES) || '{}');
+        addresses = allAddresses[userId] || [];
+        selectedAddressId = localStorage.getItem(`${userId}_selected_address`) || (addresses[0] ? addresses[0].id : null);
+    }
+    
+    function saveUserData() {
+        let userId = currentUser ? currentUser.email : 'guest';
+        let allAddresses = JSON.parse(localStorage.getItem(STORAGE_KEYS.ADDRESSES) || '{}');
+        allAddresses[userId] = addresses;
+        localStorage.setItem(STORAGE_KEYS.ADDRESSES, JSON.stringify(allAddresses));
+        localStorage.setItem(`${userId}_selected_address`, selectedAddressId);
+    }
+    
+    function register(name, email, password) {
+        let users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+        if (users.find(u => u.email === email)) {
+            showToast('Email already registered!', 'error');
+            return false;
+        }
+        users.push({ name, email, password, registeredDate: new Date().toISOString() });
+        localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+        showToast('Registration successful! Please login.', 'success');
+        return true;
+    }
+    
+    function login(email, password) {
+        let users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+        let user = users.find(u => u.email === email && u.password === password);
+        if (user) {
+            currentUser = { name: user.name, email: user.email };
+            localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(currentUser));
+            loadUserData();
+            updateUserMenu();
+            showToast(`Welcome back, ${user.name}!`, 'success');
+            renderCurrentPage();
+            return true;
+        }
+        showToast('Invalid email or password!', 'error');
+        return false;
+    }
+    
+    function logout() {
+        currentUser = null;
+        localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+        loadUserData();
+        updateUserMenu();
+        showToast('Logged out successfully!', 'success');
+        navigateTo('products');
+    }
+    
+    function updateUserMenu() {
+        let userNameDisplay = document.getElementById('userNameDisplay');
+        let userEmailDisplay = document.getElementById('userEmailDisplay');
+        let loginMenuItem = document.getElementById('loginMenuItem');
+        let registerMenuItem = document.getElementById('registerMenuItem');
+        let logoutMenuItem = document.getElementById('logoutMenuItem');
+        if (!userNameDisplay) return;
+        if (currentUser) {
+            userNameDisplay.textContent = currentUser.name;
+            userEmailDisplay.textContent = currentUser.email;
+            if (loginMenuItem) loginMenuItem.classList.add('hidden');
+            if (registerMenuItem) registerMenuItem.classList.add('hidden');
+            if (logoutMenuItem) logoutMenuItem.classList.remove('hidden');
+        } else {
+            userNameDisplay.textContent = 'Guest User';
+            userEmailDisplay.textContent = 'Not logged in';
+            if (loginMenuItem) loginMenuItem.classList.remove('hidden');
+            if (registerMenuItem) registerMenuItem.classList.remove('hidden');
+            if (logoutMenuItem) logoutMenuItem.classList.add('hidden');
+        }
+    }
+    
+    // ==================== MODALS ====================
+    function closeAllModals() { document.querySelectorAll('.modal').forEach(m => m.remove()); }
+    
+    function showLoginModal() {
+        closeAllModals();
+        let modalHtml = `
+            <div class="modal" id="loginModal" onclick="if(event.target===this) closeModal('loginModal')">
+                <div class="modal-content">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">Login</h2>
+                        <button onclick="closeModal('loginModal')" class="text-gray-400 hover:text-gray-600">✕</button>
+                    </div>
+                    <form onsubmit="event.preventDefault(); handleLogin()">
+                        <div class="mb-4"><label class="block text-sm font-medium mb-1">Email</label><input type="email" id="loginEmail" class="w-full border rounded-lg px-3 py-2" required></div>
+                        <div class="mb-4"><label class="block text-sm font-medium mb-1">Password</label><input type="password" id="loginPassword" class="w-full border rounded-lg px-3 py-2" required></div>
+                        <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg">Login</button>
+                    </form>
+                    <p class="text-center text-sm text-gray-500 mt-4">New user? <button onclick="closeModal('loginModal'); showRegisterModal()" class="text-indigo-600">Register</button></p>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        let userMenu = document.getElementById('userMenu');
+        if (userMenu) userMenu.classList.add('hidden');
+    }
+    
+    function showRegisterModal() {
+        closeAllModals();
+        let modalHtml = `
+            <div class="modal" id="registerModal" onclick="if(event.target===this) closeModal('registerModal')">
+                <div class="modal-content">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">Register</h2>
+                        <button onclick="closeModal('registerModal')" class="text-gray-400 hover:text-gray-600">✕</button>
+                    </div>
+                    <form onsubmit="event.preventDefault(); handleRegister()">
+                        <div class="mb-4"><label class="block text-sm font-medium mb-1">Full Name</label><input type="text" id="regName" class="w-full border rounded-lg px-3 py-2" required></div>
+                        <div class="mb-4"><label class="block text-sm font-medium mb-1">Email</label><input type="email" id="regEmail" class="w-full border rounded-lg px-3 py-2" required></div>
+                        <div class="mb-4"><label class="block text-sm font-medium mb-1">Password</label><input type="password" id="regPassword" class="w-full border rounded-lg px-3 py-2" required></div>
+                        <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg">Register</button>
+                    </form>
+                    <p class="text-center text-sm text-gray-500 mt-4">Already have an account? <button onclick="closeModal('registerModal'); showLoginModal()" class="text-indigo-600">Login</button></p>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        let userMenu = document.getElementById('userMenu');
+        if (userMenu) userMenu.classList.add('hidden');
+    }
+    
+    function handleLogin() {
+        let email = document.getElementById('loginEmail')?.value;
+        let password = document.getElementById('loginPassword')?.value;
+        if (email && password && login(email, password)) closeModal('loginModal');
+    }
+    
+    function handleRegister() {
+        let name = document.getElementById('regName')?.value;
+        let email = document.getElementById('regEmail')?.value;
+        let password = document.getElementById('regPassword')?.value;
+        if (name && email && password && register(name, email, password)) {
+            closeModal('registerModal');
+            showLoginModal();
+        }
+    }
+    
+    function closeModal(modalId) { let modal = document.getElementById(modalId); if (modal) modal.remove(); }
+    
+    // ==================== ADDRESS MANAGEMENT ====================
+    function showAddAddressModal() {
+        let modalHtml = `
+            <div class="modal" id="addressModal" onclick="if(event.target===this) closeModal('addressModal')">
+                <div class="modal-content">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">Add New Address</h2>
+                        <button onclick="closeModal('addressModal')" class="text-gray-400 hover:text-gray-600">✕</button>
+                    </div>
+                    <form onsubmit="event.preventDefault(); saveAddress()">
+                        <div class="mb-3"><label class="block text-sm font-medium mb-1">Full Name</label><input type="text" id="addrName" value="${currentUser ? currentUser.name : ''}" class="w-full border rounded-lg px-3 py-2" required></div>
+                        <div class="mb-3"><label class="block text-sm font-medium mb-1">Mobile Number</label><input type="tel" id="addrPhone" placeholder="10-digit" class="w-full border rounded-lg px-3 py-2" required></div>
+                        <div class="mb-3"><label class="block text-sm font-medium mb-1">Address Line</label><input type="text" id="addrLine" placeholder="Street, Building" class="w-full border rounded-lg px-3 py-2" required></div>
+                        <div class="mb-3"><label class="block text-sm font-medium mb-1">City</label><input type="text" id="addrCity" class="w-full border rounded-lg px-3 py-2" required></div>
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div><label class="block text-sm font-medium mb-1">State</label><input type="text" id="addrState" class="w-full border rounded-lg px-3 py-2" required></div>
+                            <div><label class="block text-sm font-medium mb-1">Pincode</label><input type="text" id="addrPincode" placeholder="6 digits" class="w-full border rounded-lg px-3 py-2" required></div>
+                        </div>
+                        <div class="mb-3"><label class="flex items-center gap-2"><input type="checkbox" id="addrDefault"> Set as default</label></div>
+                        <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg">Save Address</button>
+                    </form>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+    
+    function saveAddress() {
+        let name = document.getElementById('addrName').value;
+        let phone = document.getElementById('addrPhone').value;
+        let line = document.getElementById('addrLine').value;
+        let city = document.getElementById('addrCity').value;
+        let state = document.getElementById('addrState').value;
+        let pincode = document.getElementById('addrPincode').value;
+        let isDefault = document.getElementById('addrDefault').checked;
+        
+        if (!phone.match(/^[0-9]{10}$/)) { showToast('Enter valid 10-digit mobile', 'error'); return; }
+        if (!pincode.match(/^[0-9]{6}$/)) { showToast('Enter valid 6-digit pincode', 'error'); return; }
+        
+        let newAddress = { id: Date.now().toString(), name, phone, line, city, state, pincode, isDefault };
+        if (isDefault) { addresses.forEach(addr => addr.isDefault = false); selectedAddressId = newAddress.id; }
+        addresses.push(newAddress);
+        saveUserData();
+        closeModal('addressModal');
+        showToast('Address added!', 'success');
+        if (currentPage === 'addresses') renderCurrentPage();
+    }
+    
+    function deleteAddress(addressId) {
+        if (confirm('Delete this address?')) {
+            addresses = addresses.filter(a => a.id !== addressId);
+            if (selectedAddressId === addressId) selectedAddressId = addresses[0]?.id || null;
+            saveUserData();
+            showToast('Address deleted', 'success');
+            if (currentPage === 'addresses') renderCurrentPage();
+        }
+    }
+    
+    function selectAddress(addressId) {
+        selectedAddressId = addressId;
+        saveUserData();
+        showToast('Default address updated', 'success');
+        if (currentPage === 'addresses') renderCurrentPage();
+    }
+    
+    function getSelectedAddress() { return addresses.find(a => a.id === selectedAddressId) || addresses[0]; }
+    
+    // ==================== WISHLIST FUNCTIONS ====================
+    function addToWishlist(productId) {
+        if (wishlist.includes(productId)) {
+            showToast('Already in wishlist', 'error');
+            return false;
+        }
+        wishlist.push(productId);
+        saveWishlist();
+        showToast('Added to wishlist', 'success');
+        renderCurrentPage();
+        return true;
+    }
+    
+    function removeFromWishlist(productId) {
+        wishlist = wishlist.filter(id => id !== productId);
+        saveWishlist();
+        showToast('Removed from wishlist', 'success');
+        renderCurrentPage();
+    }
+    
+    function saveWishlist() {
+        localStorage.setItem('ecommerce_wishlist_' + (currentUser ? currentUser.email : 'guest'), JSON.stringify(wishlist));
+    }
+    
+    function loadWishlist() {
+        let saved = localStorage.getItem('ecommerce_wishlist_' + (currentUser ? currentUser.email : 'guest'));
+        wishlist = saved ? JSON.parse(saved) : [];
+    }
+    
+    // ==================== HELPER FUNCTIONS ====================
+    function showToast(message, type = 'success') {
+        let toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function updateCartCount() {
+        let count = cart.reduce((sum, item) => sum + item.quantity, 0);
+        document.querySelectorAll('#cartCountSidebar, #cartCountHeader').forEach(el => {
+            if (count > 0) { el.textContent = count; el.classList.remove('hidden'); } 
+            else { el.classList.add('hidden'); }
+        });
+    }
+    
+    function getCartTotal() { return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0); }
+    
+    function refreshPage() { loadProducts(); loadCart(); loadOrders(); renderCurrentPage(); showToast('Refreshed!', 'success'); }
+    
+    function toggleUserMenu() { let menu = document.getElementById('userMenu'); if (menu) menu.classList.toggle('hidden'); }
+    
+    function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    
+    function scrollToProduct(productId) {
+        let element = document.getElementById(`product-${productId}`);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            element.style.boxShadow = '0 0 0 3px #4f46e5';
+            setTimeout(() => { element.style.boxShadow = ''; }, 2000);
+        }
+    }
+    
+    // ==================== ADMIN FUNCTIONS ====================
+    function addProduct() {
+        let name = document.getElementById('adminName').value.trim();
+        let price = parseFloat(document.getElementById('adminPrice').value);
+        let stock = parseInt(document.getElementById('adminStock').value);
+        let category = document.getElementById('adminCategory').value.trim();
+        if (!name || isNaN(price) || isNaN(stock) || !category) { showToast('Fill all fields', 'error'); return; }
+        if (price <= 0 || stock < 0) { showToast('Positive values only', 'error'); return; }
+        addProductAPI(name, price, stock, category);
+        document.getElementById('adminName').value = ''; document.getElementById('adminPrice').value = '';
+        document.getElementById('adminStock').value = ''; document.getElementById('adminCategory').value = '';
+    }
+    
+    function updateProduct(productId) {
+        let newStock = prompt("Enter new stock:");
+        if (!newStock) return;
+        newStock = parseInt(newStock);
+        if (isNaN(newStock) || newStock < 0) { showToast('Invalid stock', 'error'); return; }
+        let newPrice = prompt("Enter new price (₹):");
+        if (!newPrice) return;
+        newPrice = parseFloat(newPrice);
+        if (isNaN(newPrice) || newPrice <= 0) { showToast('Invalid price', 'error'); return; }
+        updateProductAPI(productId, newStock, newPrice);
+    }
+    
+    function deleteProduct(productId) { if (confirm('Delete this product?')) deleteProductAPI(productId); }
+    
+    // ==================== ORDER FUNCTIONS ====================
+   function getDeliveryDate() {
+    let date = new Date();
+    date.setDate(date.getDate() + 2);
+    return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+    
+    function getPaymentStatus(paymentMethod) {
+        if (paymentMethod === 'Cash on Delivery' || paymentMethod === 'COD') {
+            return { status: 'Unpaid', class: 'status-unpaid', text: 'Pending (COD)' };
+        }
+        return { status: 'Paid', class: 'status-paid', text: 'Paid' };
+    }
+    
+    function showCheckoutModal() {
+        if (cart.length === 0) { showToast('Cart empty', 'error'); return; }
+        if (!currentUser && addresses.length === 0) { showToast('Login and add address first', 'warning'); showLoginModal(); return; }
+        if (addresses.length === 0) { showToast('Add shipping address first', 'warning'); showAddAddressModal(); return; }
+        
+        let subtotal = getCartTotal();
+        let gst = subtotal * 0.18;
+        let delivery = subtotal > 999 ? 0 : 99;
+        let total = subtotal + gst + delivery;
+        let selectedAddress = getSelectedAddress();
+        
+        let modalHtml = `
+            <div class="modal" id="checkoutModal" onclick="if(event.target===this) closeModal('checkoutModal')">
+                <div class="modal-content">
+                    <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">Checkout</h2><button onclick="closeModal('checkoutModal')" class="text-gray-400">✕</button></div>
+                    <div class="mb-4 p-3 bg-green-50 rounded-lg"><p class="text-sm font-medium">Shipping to:</p><p class="text-sm">${selectedAddress.name}<br>${selectedAddress.line}<br>${selectedAddress.city}, ${selectedAddress.state} - ${selectedAddress.pincode}<br>📞 ${selectedAddress.phone}</p></div>
+                    <div class="mb-4"><div class="flex justify-between py-1"><span>Subtotal:</span><span>₹${subtotal.toLocaleString()}</span></div>
+                    <div class="flex justify-between py-1"><span>GST (18%):</span><span>₹${Math.round(gst).toLocaleString()}</span></div>
+                    <div class="flex justify-between py-1"><span>Delivery:</span><span>${delivery === 0 ? 'Free' : '₹' + delivery}</span></div>
+                    <div class="flex justify-between py-2 font-bold border-t"><span>Total:</span><span>₹${Math.round(total).toLocaleString()}</span></div></div>
+                    <div class="mb-4"><label class="block text-sm font-medium mb-1">Payment Method</label>
+                    <select id="paymentMethod" class="w-full border rounded-lg p-2">
+                        <option value="UPI">UPI (Google Pay / PhonePe)</option>
+                        <option value="Credit Card">Credit Card</option>
+                        <option value="Debit Card">Debit Card</option>
+                        <option value="Cash on Delivery">Cash on Delivery (Pay when delivered)</option>
+                    </select></div>
+                    <button onclick="processOrder()" class="w-full bg-indigo-600 text-white py-2 rounded-lg">Place Order</button>
+                    <button onclick="closeModal('checkoutModal')" class="w-full mt-2 border py-2 rounded-lg">Cancel</button>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+    
+    async function processOrder() {
+        let paymentMethod = document.getElementById('paymentMethod').value;
+        let selectedAddress = getSelectedAddress();
+        closeModal('checkoutModal');
+        
+        let subtotal = getCartTotal();
+        let gst = subtotal * 0.18;
+        let delivery = subtotal > 999 ? 0 : 99;
+        let total = subtotal + gst + delivery;
+        let orderId = 'ORD' + Date.now().toString().slice(-8) + Math.random().toString(36).substr(2, 4).toUpperCase();
+        let paymentInfo = getPaymentStatus(paymentMethod);
+        
+        let newOrder = {
+            id: orderId,
+            date: new Date().toLocaleString(),
+            timestamp: Date.now(),
+            items: JSON.parse(JSON.stringify(cart)),
+            subtotal: subtotal,
+            gst: Math.round(gst),
+            delivery: delivery,
+            total: Math.round(total),
+            paymentMethod: paymentMethod,
+            paymentStatus: paymentInfo.status,
+            orderStatus: 'Confirmed',
+            deliveryDate: getDeliveryDate(),
+            customerName: currentUser ? currentUser.name : 'Guest User',
+            customerEmail: currentUser ? currentUser.email : 'guest@example.com',
+            shippingAddress: {
+                name: selectedAddress.name,
+                phone: selectedAddress.phone,
+                line: selectedAddress.line,
+                city: selectedAddress.city,
+                state: selectedAddress.state,
+                pincode: selectedAddress.pincode
+            }
+        };
+        
+        // Update stock
+        cart.forEach(cartItem => {
+            let product = products.find(p => p.id === cartItem.id);
+            if (product) product.stock -= cartItem.quantity;
+        });
+        localStorage.setItem('ecommerce_products', JSON.stringify(products));
+        
+        orders.unshift(newOrder);
+        localStorage.setItem('ecommerce_orders', JSON.stringify(orders));
+        
+        cart = [];
+        localStorage.setItem('ecommerce_cart', JSON.stringify(cart));
+        updateCartCount();
+        
+        showToast(`Order placed! ID: ${orderId}`, 'success');
+        showReceipt(newOrder);
+        if (currentPage === 'cart') renderCurrentPage();
+        navigateTo('orders');
+    }
+    
+    function showReceipt(order) {
+        let itemsHtml = order.items.map(item => `
+            <div class="flex justify-between text-sm py-1">
+                <span>${item.name} x ${item.quantity}</span>
+                <span>₹${((item.price || 0) * item.quantity).toLocaleString()}</span>
+            </div>
+        `).join('');
+        
+        let paymentInfo = getPaymentStatus(order.paymentMethod);
+        
+        let modalHtml = `
+            <div class="modal receipt-print-area" id="receiptModal" onclick="if(event.target===this) closeModal('receiptModal')">
+                <div class="modal-content" style="max-width: 450px;">
+                    <div class="text-center mb-4">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <span class="material-symbols-outlined text-green-500 text-3xl">check_circle</span>
+                        </div>
+                        <h2 class="text-xl font-bold text-green-600">Order Confirmed!</h2>
+                        <p class="text-gray-500 text-sm">Thank you for shopping with us</p>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 pt-4 mb-4">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-gray-500">Order ID:</span>
+                            <span class="font-mono font-semibold">${order.id}</span>
+                        </div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-gray-500">Date:</span>
+                            <span>${order.date}</span>
+                        </div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-gray-500">Customer:</span>
+                            <span>${order.customerName}</span>
+                        </div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-gray-500">Payment:</span>
+                            <span>${order.paymentMethod}</span>
+                        </div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-gray-500">Payment Status:</span>
+                            <span class="status-badge ${paymentInfo.class}">${paymentInfo.text}</span>
+                        </div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-gray-500">Order Status:</span>
+                            <span class="status-badge status-processing">${order.orderStatus}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 pt-4 mb-4">
+                        <h3 class="font-semibold text-sm mb-2">Shipping Address</h3>
+                        <p class="text-sm">${order.shippingAddress.name}<br>${order.shippingAddress.line}<br>${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.pincode}<br>📞 ${order.shippingAddress.phone}</p>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 pt-4 mb-4">
+                        <h3 class="font-semibold text-sm mb-2">Items Purchased</h3>
+                        ${itemsHtml}
+                    </div>
+                    
+                    <div class="border-t border-gray-200 pt-4 mb-4">
+                        <div class="flex justify-between text-sm">
+                            <span>Subtotal</span>
+                            <span>₹${order.subtotal.toLocaleString()}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span>GST (18%)</span>
+                            <span>₹${order.gst.toLocaleString()}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span>Delivery</span>
+                            <span>${order.delivery === 0 ? 'Free' : '₹' + order.delivery}</span>
+                        </div>
+                        <div class="flex justify-between font-bold text-lg mt-2 pt-2 border-t">
+                            <span>Total Paid</span>
+                            <span class="text-indigo-600">₹${order.total.toLocaleString()}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-indigo-50 rounded-lg p-3 mb-4 text-center">
+                        <p class="text-sm text-gray-600">📦 Estimated Delivery</p>
+                        <p class="font-bold text-indigo-600">${order.deliveryDate}</p>
+                        <p class="text-xs text-gray-500 mt-1">Delivered within 2 days</p>
+                    </div>
+                    
+                    <div class="flex gap-3 no-print">
+                        <button onclick="printReceipt()" class="flex-1 border border-indigo-600 text-indigo-600 py-2 rounded-lg hover:bg-indigo-50">
+                            Print Receipt
+                        </button>
+                        <button onclick="closeModal('receiptModal')" class="flex-1 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+    
+    function printReceipt() {
+        let receiptContent = document.querySelector('#receiptModal .modal-content');
+        if (receiptContent) {
+            let printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Order Receipt</title>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', Arial, sans-serif; }
+                        body { padding: 40px 20px; display: flex; justify-content: center; background: white; }
+                        .receipt { max-width: 450px; width: 100%; background: white; border-radius: 16px; padding: 24px; }
+                        .header { text-align: center; border-bottom: 2px dashed #e5e7eb; padding-bottom: 20px; margin-bottom: 20px; }
+                        .shop-name { font-size: 24px; font-weight: bold; color: #4f46e5; }
+                        .success-icon { width: 60px; height: 60px; background: #10b981; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; margin: 0 auto 15px; }
+                        .order-title { font-size: 20px; font-weight: bold; color: #10b981; }
+                        .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
+                        .info-label { color: #6b7280; font-size: 13px; }
+                        .info-value { font-weight: 600; font-size: 13px; }
+                        .items-table { width: 100%; margin: 15px 0; border-collapse: collapse; }
+                        .items-table th { text-align: left; padding-bottom: 8px; border-bottom: 1px solid #e5e7eb; font-size: 12px; color: #6b7280; }
+                        .total-row { display: flex; justify-content: space-between; padding: 10px 0; border-top: 2px solid #e5e7eb; margin-top: 10px; font-weight: bold; font-size: 16px; }
+                        .footer { text-align: center; margin-top: 25px; padding-top: 20px; border-top: 2px dashed #e5e7eb; font-size: 11px; color: #9ca3af; }
+                        .status-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+                        .status-paid { background: #10b98120; color: #10b981; }
+                        .status-unpaid { background: #f59e0b20; color: #f59e0b; }
+                    </style>
+                </head>
+                <body>
+                    <div class="receipt">
+                        ${receiptContent.innerHTML}
+                    </div>
+                    <script>window.onload = function() { window.print(); setTimeout(function() { window.close(); }, 500); };<\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+    }
+    
+    function showOrderTracking(orderId) {
+        let order = orders.find(o => o.id === orderId);
+        if (!order) { showToast('Order not found', 'error'); return; }
+        
+        let paymentInfo = getPaymentStatus(order.paymentMethod);
+        let isDelivered = order.deliveryDate ? new Date(order.deliveryDate) <= new Date() : false;
+        
+        let statusSteps = [
+            { name: 'Order Placed', icon: 'receipt', completed: true, date: order.date },
+            { name: order.paymentMethod === 'Cash on Delivery' ? 'Payment Pending' : 'Payment Confirmed', 
+              icon: 'payments', completed: paymentInfo.status === 'Paid', 
+              statusText: paymentInfo.text },
+            { name: 'Processing', icon: 'settings', completed: true },
+            { name: 'Shipped', icon: 'local_shipping', completed: true },
+            { name: 'Out for Delivery', icon: 'delivery', completed: true },
+            { name: 'Delivered', icon: 'check_circle', completed: isDelivered, 
+              expectedDate: order.deliveryDate }
+        ];
+        
+        let modalHtml = `
+            <div class="modal" id="trackingModal" onclick="if(event.target===this) closeModal('trackingModal')">
+                <div class="modal-content" style="max-width: 450px;">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">Track Order</h2>
+                        <button onclick="closeModal('trackingModal')" class="text-gray-400">✕</button>
+                    </div>
+                    
+                    <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm text-gray-500">Order ID:</span>
+                            <span class="font-mono font-semibold">${order.id}</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm text-gray-500">Order Date:</span>
+                            <span>${order.date}</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm text-gray-500">Payment:</span>
+                            <span>${order.paymentMethod}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">Payment Status:</span>
+                            <span class="status-badge ${paymentInfo.class}">${paymentInfo.text}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        ${statusSteps.map((step, i) => `
+                            <div class="track-step ${step.completed ? 'completed' : ''} flex gap-4 mb-4">
+                                <div class="track-dot">
+                                    <span class="material-symbols-outlined text-sm">${step.icon}</span>
+                                </div>
+                                <div>
+                                    <p class="font-medium ${step.completed ? 'text-gray-800' : 'text-gray-400'}">${step.name}</p>
+                                    ${step.date ? '<p class="text-xs text-gray-500">' + step.date + '</p>' : ''}
+                                    ${step.statusText ? '<p class="text-xs text-gray-500">' + step.statusText + '</p>' : ''}
+                                    ${step.expectedDate && !step.completed ? '<p class="text-xs text-gray-500">Expected by: ' + step.expectedDate + '</p>' : ''}
+                                    ${step.completed ? '<p class="text-xs text-gray-500">Completed</p>' : '<p class="text-xs text-gray-400">Pending</p>'}
+                                </div>
+                            </div>
+                            ${i < statusSteps.length - 1 ? '<div class="track-line"></div>' : ''}
+                        `).join('')}
+                    </div>
+                    
+                    <div class="bg-indigo-50 rounded-lg p-4 mb-4">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-sm text-gray-600">Estimated Delivery</p>
+                                <p class="font-bold text-indigo-600">${order.deliveryDate || getDeliveryDate()}</p>
+                                <p class="text-xs text-gray-500">Will be delivered within 2 days</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-600">Total Amount</p>
+                                <p class="font-bold text-indigo-600">₹${order.total.toLocaleString()}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button onclick="closeModal('trackingModal'); showReceiptById('${order.id}')" class="flex-1 border border-indigo-600 text-indigo-600 py-2 rounded-lg">
+                            View Receipt
+                        </button>
+                        <button onclick="closeModal('trackingModal')" class="flex-1 bg-indigo-600 text-white py-2 rounded-lg">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+    
+  function showReceipt(orderIdOrObject) {
+    let order;
+    
+    // Check if we received an order object or an order ID
+    if (typeof orderIdOrObject === 'string') {
+        order = orders.find(o => o.id === orderIdOrObject);
+    } else {
+        order = orderIdOrObject;
+    }
+    
+    if (!order) {
+        showToast('Order not found', 'error');
+        return;
+    }
+    
+    let itemsHtml = (order.items || []).map(item => `
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+            <td style="padding: 10px 0;">${item.name} x ${item.quantity}</td>
+            <td style="padding: 10px 0; text-align: right;">₹${((item.price || 0) * item.quantity).toLocaleString()}</td>
+        </tr>
+    `).join('');
+    
+    let paymentInfo = getPaymentStatus(order.paymentMethod);
+    
+    let modalHtml = `
+        <div class="modal" id="receiptModal" onclick="if(event.target===this) closeModal('receiptModal')">
+            <div class="modal-content" style="max-width: 400px; padding: 0;">
+                <div style="padding: 24px;">
+                    <!-- Header -->
+                    <div style="text-align: center; border-bottom: 2px dashed #e5e7eb; padding-bottom: 20px; margin-bottom: 20px;">
+                        <h2 style="font-size: 22px; font-weight: bold; color: #4f46e5; margin: 0;">🛍️ ShopIndia</h2>
+                        <p style="font-size: 11px; color: #9ca3af; margin: 5px 0 0;">Your Anime & Electronics Store</p>
+                    </div>
+                    
+                    <!-- Success Icon -->
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="width: 50px; height: 50px; background: #10b981; color: white; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 24px;">✓</div>
+                        <h3 style="font-size: 18px; font-weight: bold; color: #10b981; margin: 10px 0 0;">Order Confirmed!</h3>
+                    </div>
+                    
+                    <!-- Order Details -->
+                    <div style="background: #f9fafb; border-radius: 10px; padding: 12px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 12px; color: #6b7280;">Order ID</span>
+                            <span style="font-size: 12px; font-weight: 600; font-family: monospace;">${order.id}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 12px; color: #6b7280;">Date</span>
+                            <span style="font-size: 12px;">${order.date}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 12px; color: #6b7280;">Payment</span>
+                            <span style="font-size: 12px;">${order.paymentMethod}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="font-size: 12px; color: #6b7280;">Status</span>
+                            <span style="font-size: 12px; color: #10b981; font-weight: 500;">${order.orderStatus || 'Confirmed'}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Items Table -->
+                    <table style="width: 100%; margin-bottom: 15px; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #e5e7eb;">
+                                <th style="text-align: left; padding: 8px 0; font-size: 12px; color: #6b7280;">Item</th>
+                                <th style="text-align: right; padding: 8px 0; font-size: 12px; color: #6b7280;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itemsHtml}
+                        </tbody>
+                    </table>
+                    
+                    <!-- Price Breakdown -->
+                    <div style="border-top: 1px solid #e5e7eb; padding-top: 12px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
+                            <span>Subtotal</span>
+                            <span>₹${(order.subtotal || 0).toLocaleString()}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
+                            <span>GST (18%)</span>
+                            <span>₹${(order.gst || 0).toLocaleString()}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
+                            <span>Delivery</span>
+                            <span>${(order.delivery || 0) === 0 ? 'Free' : '₹' + (order.delivery || 0)}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: bold; border-top: 2px solid #e5e7eb; padding-top: 10px; margin-top: 5px;">
+                            <span>Total</span>
+                            <span style="color: #4f46e5;">₹${(order.total || 0).toLocaleString()}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Delivery Info -->
+                    <div style="background: #eef2ff; border-radius: 10px; padding: 12px; text-align: center; margin-bottom: 20px;">
+                        <p style="font-size: 11px; color: #6b7280; margin: 0;">📦 Estimated Delivery</p>
+                        <p style="font-size: 14px; font-weight: bold; color: #4f46e5; margin: 5px 0 0;">${order.deliveryDate || getDeliveryDate()}</p>
+                        <p style="font-size: 10px; color: #9ca3af; margin: 3px 0 0;">Delivered within 2 days</p>
+                    </div>
+                    
+                    <!-- Buttons -->
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="printReceipt()" style="flex: 1; border: 1px solid #4f46e5; background: white; color: #4f46e5; padding: 10px; border-radius: 8px; font-size: 13px; cursor: pointer;">Print Receipt</button>
+                        <button onclick="closeModal('receiptModal')" style="flex: 1; background: #4f46e5; color: white; padding: 10px; border-radius: 8px; font-size: 13px; border: none; cursor: pointer;">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+    
+    function confirmCancelOrder(orderId) {
+        let modalHtml = `<div class="confirm-modal" id="cancelConfirmModal"><div class="confirm-content"><span class="material-symbols-outlined text-5xl text-orange-500 mb-3">warning</span><h3 class="text-xl font-bold mb-2">Cancel Order?</h3><p class="text-gray-500 mb-4">This cannot be undone.</p><div class="flex gap-3"><button onclick="closeCancelConfirmModal()" class="flex-1 border py-2 rounded-lg">No</button><button onclick="cancelOrder('${orderId}')" class="flex-1 bg-red-600 text-white py-2 rounded-lg">Yes, Cancel</button></div></div></div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+    
+    function closeCancelConfirmModal() { let modal = document.getElementById('cancelConfirmModal'); if (modal) modal.remove(); }
+    
+    function cancelOrder(orderId) {
+        let order = orders.find(o => o.id === orderId);
+        if (order && order.orderStatus !== 'Delivered') {
+            // Restore stock
+            order.items.forEach(item => {
+                let product = products.find(p => p.id === item.id);
+                if (product) product.stock += item.quantity;
+            });
+            order.orderStatus = 'Cancelled';
+            localStorage.setItem('ecommerce_orders', JSON.stringify(orders));
+            localStorage.setItem('ecommerce_products', JSON.stringify(products));
+            showToast('Order cancelled', 'warning');
+            closeCancelConfirmModal();
+            renderCurrentPage();
+        } else {
+            showToast('Cannot cancel delivered order', 'error');
+            closeCancelConfirmModal();
+        }
+    }
+    
+    // ==================== RENDER FUNCTIONS ====================
+    function renderDashboard() {
+        let totalOrders = orders.length;
+        let totalSpent = orders.reduce((s, o) => s + (o.total || 0), 0);
+        return `
+            <div class="max-w-6xl mx-auto"><h1 class="text-2xl font-bold mb-6">Dashboard</h1>
+            <p class="text-gray-500 mb-6">Welcome${currentUser ? ' ' + currentUser.name : ', Guest User'}!</p>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white p-5 rounded-xl"><span class="material-symbols-outlined text-indigo-500 text-3xl">shopping_bag</span><p class="text-2xl font-bold mt-2">${products.length}</p><p class="text-gray-500">Products</p></div>
+                <div class="bg-white p-5 rounded-xl"><span class="material-symbols-outlined text-green-500 text-3xl">receipt_long</span><p class="text-2xl font-bold mt-2">${totalOrders}</p><p class="text-gray-500">Orders</p></div>
+                <div class="bg-white p-5 rounded-xl"><span class="material-symbols-outlined text-orange-500 text-3xl">currency_rupee</span><p class="text-2xl font-bold mt-2">₹${totalSpent.toLocaleString()}</p><p class="text-gray-500">Spent</p></div>
+                <div class="bg-white p-5 rounded-xl"><span class="material-symbols-outlined text-pink-500 text-3xl">favorite</span><p class="text-2xl font-bold mt-2">${wishlist.length}</p><p class="text-gray-500">Wishlist</p></div>
+            </div>
+            ${!currentUser ? `<div class="bg-indigo-50 rounded-xl p-6 text-center mb-6"><p class="text-gray-700 mb-3">Create an account for better experience!</p><button onclick="showRegisterModal()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg">Register Now</button><button onclick="showLoginModal()" class="ml-3 border border-indigo-600 text-indigo-600 px-6 py-2 rounded-lg">Login</button></div>` : ''}
+            <div class="bg-white rounded-xl p-6"><h2 class="font-semibold text-lg mb-4">Recent Orders</h2>${orders.length === 0 ? '<p class="text-gray-500">No orders yet</p>' : orders.slice(0,5).map(o => `<div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg mb-2"><div><p class="font-medium">${o.id}</p><p class="text-sm text-gray-500">${o.date}</p></div><div><p class="font-bold text-indigo-600">₹${(o.total || 0).toLocaleString()}</p><p class="text-xs ${o.orderStatus === 'Cancelled' ? 'text-red-500' : 'text-green-600'}">${o.orderStatus || 'Confirmed'}</p></div></div>`).join('')}</div>
+            </div>
+        `;
+    }
+    
+    function renderProducts() {
+        let searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+        let filtered = products.filter(p => p.name.toLowerCase().includes(searchTerm));
+        
+        let adminSection = '';
+        
+        if (adminLoggedIn) {
+            adminSection = `
+                <div class="admin-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3>Admin Panel - Manage Inventory</h3>
+                        <button onclick="adminLogout()" class="admin-logout-btn">Logout</button>
+                    </div>
+                    <div class="mb-6">
+                        <h4 class="font-semibold text-amber-800 mb-3">Add New Product</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                            <input type="text" id="adminName" placeholder="Product Name" class="admin-input">
+                            <input type="text" id="adminCategory" placeholder="Category" class="admin-input">
+                            <input type="number" id="adminPrice" placeholder="Price (₹)" class="admin-input">
+                            <input type="number" id="adminStock" placeholder="Stock" class="admin-input">
+                        </div>
+                        <button onclick="addProduct()" class="admin-btn mt-3">Add Product</button>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-amber-800 mb-3">Edit / Delete Products</h4>
+                        <div class="overflow-x-auto">
+                            <table class="admin-table">
+                                <thead><tr class="bg-amber-100"><th>ID</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead>
+                                <tbody>${products.map(p => `<tr><td>${p.id}</td><td>${p.name}</td><td>${p.category}</td><td>₹${(p.price || 0).toLocaleString()}</td><td class="${p.stock < 10 ? 'low-stock' : ''}">${p.stock}</td><td><button onclick="updateProduct('${p.id}')" class="text-amber-600 mr-2">Edit</button><button onclick="deleteProduct('${p.id}')" class="text-red-600">Delete</button></td></tr>`).join('')}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            adminSection = `
+                <div class="admin-login-form">
+                    <h3 class="font-bold text-amber-800 mb-3">Admin Access</h3>
+                    <p class="text-sm text-gray-600 mb-3">Enter admin credentials to manage products</p>
+                    <input type="text" id="adminUsername" placeholder="Username" class="admin-login-input">
+                    <input type="password" id="adminPassword" placeholder="Password" class="admin-login-input">
+                    <button onclick="adminLogin()" class="admin-login-btn">Login</button>
+                </div>
+            `;
+        }
+        
+        return `
+            <div class="max-w-6xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold">All Products</h1>
+                    <div class="text-sm text-gray-500">Click on any product to scroll to it</div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                    ${filtered.map(p => `
+                        <div id="product-${p.id}" class="product-card bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer" onclick="scrollToProduct('${p.id}')">
+                            <div class="p-4">
+                                <div class="flex justify-between">
+                                    <div>
+                                        <span class="text-xs text-gray-400">#${p.id}</span>
+                                        <h3 class="font-semibold mt-1">${p.name}</h3>
+                                    </div>
+                                    <button onclick="event.stopPropagation(); addToWishlist('${p.id}')" class="text-gray-400 hover:text-red-500">
+                                        <span class="material-symbols-outlined ${wishlist.includes(p.id) ? 'text-red-500' : ''}">favorite</span>
+                                    </button>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">${p.category}</p>
+                                <p class="text-xl font-bold text-indigo-600 mt-2">₹${(p.price || 0).toLocaleString()}</p>
+                                <p class="text-xs ${p.stock <= 0 ? 'text-red-500' : p.stock < 10 ? 'low-stock' : 'text-green-500'} mt-1">
+                                    ${p.stock <= 0 ? 'Out of Stock' : p.stock < 10 ? `⚠️ Only ${p.stock} left!` : `In Stock: ${p.stock}`}
+                                </p>
+                                ${p.stock > 0 ? `
+                                    <div class="quantity-selector" onclick="event.stopPropagation()">
+                                        <button class="quantity-btn" onclick="decrementQty('${p.id}')">-</button>
+                                        <input type="number" id="qty_${p.id}" value="1" min="1" max="${p.stock}" class="quantity-input">
+                                        <button class="quantity-btn" onclick="incrementQty('${p.id}', ${p.stock})">+</button>
+                                        <button onclick="addToCart('${p.id}', parseInt(document.getElementById('qty_${p.id}').value))" class="flex-1 bg-indigo-600 text-white py-2 rounded-lg text-sm hover:bg-indigo-700">
+                                            Add to Cart
+                                        </button>
+                                    </div>
+                                ` : '<button disabled class="w-full mt-3 bg-gray-300 text-gray-500 py-2 rounded-lg text-sm out-of-stock">Out of Stock</button>'}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                ${filtered.length === 0 ? '<p class="text-center text-gray-500 py-10">No products found</p>' : ''}
+                ${adminSection}
+            </div>
+        `;
+    }
+    
+    function incrementQty(productId, maxStock) {
+        let input = document.getElementById(`qty_${productId}`);
+        let current = parseInt(input.value);
+        if (current < maxStock) {
+            input.value = current + 1;
+        } else {
+            showToast(`Only ${maxStock} items available`, 'warning');
+        }
+    }
+    
+    function decrementQty(productId) {
+        let input = document.getElementById(`qty_${productId}`);
+        let current = parseInt(input.value);
+        if (current > 1) {
+            input.value = current - 1;
+        }
+    }
+    
+    function renderCart() {
+        if (cart.length === 0) return `<div class="text-center py-16"><h2 class="text-xl font-semibold">Cart empty</h2><button onclick="navigateTo('products')" class="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg">Shop Now</button></div>`;
+        let subtotal = getCartTotal(), gst = subtotal * 0.18, delivery = subtotal > 999 ? 0 : 99, total = subtotal + gst + delivery;
+        return `<div class="max-w-4xl mx-auto"><h1 class="text-2xl font-bold mb-6">Cart</h1><div class="bg-white rounded-xl">${cart.map(item => `<div class="flex items-center justify-between p-4 border-b"><div><h3 class="font-medium">${item.name}</h3><p class="text-indigo-600">₹${(item.price || 0).toLocaleString()}</p></div><div class="flex items-center gap-2"><button onclick="updateCartQuantity('${item.id}', ${item.quantity-1})" class="w-8 h-8 border rounded">-</button><span>${item.quantity}</span><button onclick="updateCartQuantity('${item.id}', ${item.quantity+1})" class="w-8 h-8 border rounded">+</button></div><div><p class="font-semibold">₹${((item.price || 0) * item.quantity).toLocaleString()}</p><button onclick="updateCartQuantity('${item.id}', 0)" class="text-red-500 text-sm">Remove</button></div></div>`).join('')}</div><div class="mt-6 bg-white rounded-xl p-5"><div class="space-y-2"><div class="flex justify-between"><span>Subtotal</span><span>₹${subtotal.toLocaleString()}</span></div><div class="flex justify-between"><span>GST (18%)</span><span>₹${Math.round(gst).toLocaleString()}</span></div><div class="flex justify-between"><span>Delivery</span><span>${delivery === 0 ? 'Free' : '₹' + delivery}</span></div><div class="border-t pt-2 font-bold flex justify-between"><span>Total</span><span>₹${Math.round(total).toLocaleString()}</span></div></div><button onclick="showCheckoutModal()" class="w-full mt-5 bg-indigo-600 text-white py-2 rounded-lg">Checkout</button></div></div>`;
+    }
+    
+    function renderWishlist() {
+        let wishItems = products.filter(p => wishlist.includes(p.id));
+        if (wishItems.length === 0) return `<div class="text-center py-16"><h2 class="text-xl font-semibold">Wishlist empty</h2><button onclick="navigateTo('products')" class="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg">Browse Products</button></div>`;
+        return `<div class="max-w-4xl mx-auto"><h1 class="text-2xl font-bold mb-6">Wishlist</h1><div class="bg-white rounded-xl">${wishItems.map(p => `<div class="flex items-center justify-between p-4 border-b"><div><h3 class="font-medium">${p.name}</h3><p class="text-indigo-600">₹${(p.price || 0).toLocaleString()}</p></div><button onclick="addToCart('${p.id}',1); removeFromWishlist('${p.id}')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm">Move to Cart</button></div>`).join('')}</div></div>`;
+    }
+    
+    function renderOrders() {
+    if (orders.length === 0) return `<div class="text-center py-16"><h2 class="text-xl font-semibold">No orders yet</h2><button onclick="navigateTo('products')" class="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg">Start Shopping</button></div>`;
+    
+    return `
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-2xl font-bold mb-6">Order History (${orders.length} orders)</h1>
+            <div class="space-y-4">
+                ${orders.map(order => {
+                    let paymentInfo = getPaymentStatus(order.paymentMethod);
+                    return `
+                        <div class="bg-white rounded-xl p-5 ${order.orderStatus === 'Cancelled' ? 'bg-red-50' : ''}">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="font-mono text-sm text-gray-500">${order.id}</p>
+                                    <p class="text-sm text-gray-500">${order.date}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-indigo-600">₹${(order.total || 0).toLocaleString()}</p>
+                                    <p class="text-xs ${order.orderStatus === 'Cancelled' ? 'text-red-500' : 'text-green-600'}">${order.orderStatus || 'Confirmed'}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="border-t mt-3 pt-3">
+                                ${(order.items || []).map(item => `
+                                    <div class="flex justify-between text-sm py-1">
+                                        <span>${item.name} x${item.quantity}</span>
+                                        <span>₹${((item.price || 0) * item.quantity).toLocaleString()}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="text-xs text-gray-400">Payment: ${order.paymentMethod}</span>
+                                <span class="status-badge ${paymentInfo.class} text-xs">${paymentInfo.text}</span>
+                            </div>
+                            
+                            <div class="flex gap-3 mt-3">
+                                <button onclick="showOrderTracking('${order.id}')" class="text-indigo-600 text-sm hover:underline">Track Order</button>
+                                ${order.orderStatus !== 'Cancelled' && order.orderStatus !== 'Delivered' ? 
+                                    `<button onclick="confirmCancelOrder('${order.id}')" class="text-red-600 text-sm hover:underline">Cancel Order</button>` : ''}
+                                <button onclick="showReceipt('${order.id}')" class="text-indigo-600 text-sm hover:underline">View Receipt</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        </div>
+    `;
+}
+    
+    function renderAddresses() {
+        if (!currentUser) return `<div class="text-center py-16"><h2 class="text-xl font-semibold">Please login to manage addresses</h2><button onclick="showLoginModal()" class="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg">Login</button></div>`;
+        if (addresses.length === 0) return `<div class="text-center py-16"><h2 class="text-xl font-semibold">No addresses saved</h2><button onclick="showAddAddressModal()" class="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg">Add Address</button></div>`;
+        return `<div class="max-w-3xl mx-auto"><div class="flex justify-between mb-6"><h1 class="text-2xl font-bold">My Addresses</h1><button onclick="showAddAddressModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm">+ Add New</button></div><div class="grid gap-4">${addresses.map(a => `<div class="bg-white rounded-xl p-5 border ${selectedAddressId === a.id ? 'border-indigo-500 bg-indigo-50' : 'border-gray-100'}"><div class="flex justify-between"><div><p class="font-semibold">${a.name} ${a.isDefault ? '<span class="text-xs bg-green-100 text-green-600 px-2 ml-2 rounded">Default</span>' : ''}</p><p class="text-sm">${a.line}<br>${a.city}, ${a.state} - ${a.pincode}<br>📞 ${a.phone}</p></div><div class="flex gap-2">${!a.isDefault ? `<button onclick="selectAddress('${a.id}')" class="text-indigo-600 text-sm">Set Default</button>` : ''}<button onclick="deleteAddress('${a.id}')" class="text-red-500 text-sm">Delete</button></div></div></div>`).join('')}</div></div>`;
+    }
+    
+    function renderProfile() {
+        return `<div class="max-w-2xl mx-auto"><h1 class="text-2xl font-bold mb-6">My Profile</h1><div class="bg-white rounded-xl p-6"><div class="flex items-center gap-4 mb-6"><div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center text-3xl">${currentUser ? currentUser.name.charAt(0).toUpperCase() : '👤'}</div><div><h2 class="text-xl font-semibold">${currentUser ? currentUser.name : 'Guest User'}</h2><p class="text-gray-500">${currentUser ? currentUser.email : 'Not logged in'}</p></div></div><div class="border-t pt-4"><div class="flex justify-between py-2"><span>Total Orders</span><span class="font-semibold">${orders.length}</span></div><div class="flex justify-between py-2"><span>Total Spent</span><span class="font-semibold">₹${orders.reduce((s,o)=>s+(o.total||0),0).toLocaleString()}</span></div><div class="flex justify-between py-2"><span>Wishlist</span><span class="font-semibold">${wishlist.length}</span></div><div class="flex justify-between py-2"><span>Addresses</span><span class="font-semibold">${addresses.length}</span></div></div>${!currentUser ? `<div class="border-t mt-4 pt-4 flex gap-3"><button onclick="showLoginModal()" class="flex-1 bg-indigo-600 text-white py-2 rounded-lg">Login</button><button onclick="showRegisterModal()" class="flex-1 border border-indigo-600 text-indigo-600 py-2 rounded-lg">Register</button></div>` : ''}</div></div>`;
+    }
+    
+    async function renderCurrentPage() {
+        let content = '';
+        switch(currentPage) {
+            case 'dashboard': content = renderDashboard(); break;
+            case 'products': content = renderProducts(); break;
+            case 'cart': content = renderCart(); break;
+            case 'wishlist': content = renderWishlist(); break;
+            case 'orders': content = renderOrders(); break;
+            case 'addresses': content = renderAddresses(); break;
+            case 'profile': content = renderProfile(); break;
+            default: content = renderProducts();
+        }
+        document.getElementById('pageContent').innerHTML = content;
+    }
+    
+    function navigateTo(page) { currentPage = page; renderCurrentPage(); let sidebar = document.querySelector('.sidebar'); if (window.innerWidth < 768 && sidebar) sidebar.classList.add('-translate-x-full'); document.getElementById('userMenu')?.classList.add('hidden'); }
+    function toggleSidebar() { document.querySelector('.sidebar')?.classList.toggle('-translate-x-full'); }
+    
+    document.addEventListener('click', function(event) {
+        let userMenu = document.getElementById('userMenu');
+        let userBtn = document.getElementById('userMenuBtn');
+        if (userMenu && !userMenu.classList.contains('hidden') && userBtn && !userMenu.contains(event.target) && !userBtn.contains(event.target)) userMenu.classList.add('hidden');
+    });
+    
+    async function init() {
+        await loadProducts();
+        await loadCart();
+        await loadOrders();
+        loadWishlist();
+        let storedUser = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+        if (storedUser) { currentUser = JSON.parse(storedUser); loadUserData(); updateUserMenu(); }
+        checkAdminLogin();
+        renderCurrentPage();
+        let searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.addEventListener('input', () => { if (currentPage === 'products') renderCurrentPage(); });
+    }
+    
+    document.addEventListener('DOMContentLoaded', init);
+    
+    window.navigateTo = navigateTo; window.toggleSidebar = toggleSidebar; window.addToCart = addToCart; window.addToWishlist = addToWishlist;
+    window.removeFromWishlist = removeFromWishlist; window.updateCartQuantity = updateCartQuantity; window.showCheckoutModal = showCheckoutModal;
+    window.processOrder = processOrder; window.showLoginModal = showLoginModal; window.showRegisterModal = showRegisterModal; window.logout = logout;
+    window.closeModal = closeModal; window.toggleUserMenu = toggleUserMenu; window.showOrderTracking = showOrderTracking; window.confirmCancelOrder = confirmCancelOrder;
+    window.cancelOrder = cancelOrder; window.closeCancelConfirmModal = closeCancelConfirmModal; window.showAddAddressModal = showAddAddressModal;
+    window.deleteAddress = deleteAddress; window.selectAddress = selectAddress; window.refreshPage = refreshPage; window.addProduct = addProduct;
+    window.updateProduct = updateProduct; window.deleteProduct = deleteProduct; window.showReceipt = showReceipt; window.showReceiptById = showReceiptById;
+    window.adminLogin = adminLogin; window.adminLogout = adminLogout; window.checkAdminLogin = checkAdminLogin; window.scrollToProduct = scrollToProduct;
+    window.scrollToTop = scrollToTop; window.incrementQty = incrementQty; window.decrementQty = decrementQty; window.printReceipt = printReceipt;
+</script>
+</body>
+</html>

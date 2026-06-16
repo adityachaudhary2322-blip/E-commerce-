@@ -1,0 +1,1056 @@
+================================================================================
+                    E-COMMERCE SHOPPING PORTAL - PROJECT STRUCTURE
+================================================================================
+
+PROJECT DIRECTORY STRUCTURE:
+================================================================================
+
+ecommerce_portal/
+│
+├── main.py                      # Main application entry point
+├── user_management.py           # User registration, login, profile management
+├── product_management.py        # Product CRUD operations, search, categories
+├── cart_wishlist.py             # Shopping cart and wishlist operations
+├── order_payment.py             # Order placement, cancellation, payment processing
+├── invoice_reports.py           # Invoice generation and report creation
+├── data_storage.py              # JSON/CSV file handling operations
+├── utils.py                     # Decorators, helpers, exception handlers
+│
+├── data/                        # JSON data storage directory
+│   ├── users.json              # User records
+│   ├── products.json           # Product inventory
+│   ├── carts.json              # Shopping cart data
+│   ├── wishlists.json          # Wishlist data
+│   ├── orders.json             # Order records
+│   ├── payments.json           # Payment transactions
+│   └── invoices.json           # Invoice records
+│
+├── reports/                     # CSV report directory
+│   ├── sales_report.csv        # Sales summary report
+│   ├── order_report.csv        # Order details report
+│   └── inventory_report.csv    # Product inventory report
+│
+└── project_structure.txt        # This documentation file
+
+================================================================================
+MODULES AND THEIR RESPONSIBILITIES:
+================================================================================
+
+1. main.py
+   - Main application class EcommercePortal
+   - User interface and menu system
+   - Coordinates all other modules
+   - Handles main program flow
+
+2. user_management.py
+   - UserManager class
+   - User registration, login, password update
+   - Profile viewing and order history
+
+3. product_management.py
+   - Abstract Product class
+   - Electronics and Clothing derived classes
+   - ProductManager class for CRUD operations
+   - Recursive search by category
+
+4. cart_wishlist.py
+   - CartManager class for shopping cart
+   - WishlistManager class for wishlist
+   - Add/remove/update cart items
+   - Move items between wishlist and cart
+
+5. order_payment.py
+   - OrderManager class for orders
+   - PaymentManager class for payments
+   - Order placement, cancellation, tracking
+   - Payment processing and verification
+
+6. invoice_reports.py
+   - InvoiceManager class for invoices
+   - ReportGenerator class for CSV reports
+   - Invoice generation and export
+   - Sales, order, inventory reports
+
+7. data_storage.py
+   - DataStorage class
+   - JSON file operations for all data
+   - Save/load functionality
+
+8. utils.py
+   - Decorators (log_action, login_required, handle_exceptions)
+   - TaxCalculator static methods
+   - SalesStatistics class methods
+   - Exception classes
+   - Generator for invoices
+
+================================================================================
+CLASSES AND THEIR ATTRIBUTES/METHODS:
+================================================================================
+
+ABSTRACT CLASS: Product
+----------------------
+Attributes:
+  - product_id : str
+  - name : str
+  - price : float
+  - stock : int
+  - category : str
+
+Methods:
+  - display_product() : str (abstract)
+  - calculate_discount() : float (abstract)
+  - update_stock(quantity) : int
+
+DERIVED CLASS: Electronics (inherits Product)
+-----------------------------------------------
+Additional Attributes:
+  - brand : str
+  - warranty : str
+  - model : str
+
+Methods:
+  - display_product() : str (polymorphic)
+  - calculate_discount() : float (10% discount)
+
+DERIVED CLASS: Clothing (inherits Product)
+-------------------------------------------
+Additional Attributes:
+  - size : str
+  - color : str
+  - material : str
+
+Methods:
+  - display_product() : str (polymorphic)
+  - calculate_discount() : float (20% discount)
+
+CLASS: User
+------------
+Attributes:
+  - user_id : str
+  - name : str
+  - email : str
+  - password : str
+  - registered_date : str
+  - order_history : list
+
+Methods:
+  - register() : handled by UserManager
+  - login() : handled by UserManager
+  - update_profile() : handled by UserManager
+  - view_orders() : handled by UserManager
+
+CLASS: Cart
+------------
+Attributes:
+  - cart_id : str
+  - user_id : str
+  - products : list
+  - total_amount : float
+
+Methods:
+  - add_product() : handled by CartManager
+  - remove_product() : handled by CartManager
+  - update_quantity() : handled by CartManager
+  - calculate_total() : handled by CartManager
+
+CLASS: Wishlist
+----------------
+Attributes:
+  - wishlist_id : str
+  - user_id : str
+  - products : list
+
+Methods:
+  - add_to_wishlist() : handled by WishlistManager
+  - remove_from_wishlist() : handled by WishlistManager
+  - move_to_cart() : handled by WishlistManager
+
+CLASS: Order
+-------------
+Attributes:
+  - order_id : str
+  - user_id : str
+  - products : list
+  - order_date : str
+  - order_status : str
+  - total_amount : float
+  - payment_mode : str
+
+Methods:
+  - place_order() : handled by OrderManager
+  - cancel_order() : handled by OrderManager
+  - track_order() : handled by OrderManager
+
+CLASS: Payment
+---------------
+Attributes:
+  - payment_id : str
+  - order_id : str
+  - payment_mode : str
+  - payment_status : str
+  - amount : float
+  - payment_date : str
+
+Methods:
+  - process_payment() : handled by PaymentManager
+  - verify_payment() : handled by PaymentManager
+  - generate_receipt() : handled by PaymentManager
+
+CLASS: Invoice
+---------------
+Attributes:
+  - invoice_id : str
+  - order_id : str
+  - invoice_date : str
+  - total_amount : float
+  - products : list
+  - user_id : str
+
+Methods:
+  - generate_invoice() : handled by InvoiceManager
+  - export_invoice() : handled by InvoiceManager
+
+CLASS: Store (Composition)
+---------------------------
+Attributes (managed by DataStorage):
+  - users : list
+  - products : list
+  - carts : list
+  - wishlists : list
+  - orders : list
+  - payments : list
+  - invoices : list
+
+Methods:
+  - add_product() : handled by ProductManager
+  - register_user() : handled by UserManager
+  - manage_orders() : handled by OrderManager
+  - generate_reports() : handled by ReportGenerator
+  - save_data() : handled by DataStorage
+  - load_data() : handled by DataStorage
+
+================================================================================
+VARIABLES AND DATA TYPES:
+================================================================================
+
+PRIMITIVE VARIABLES:
+--------------------
+- user_id : str (UUID format, 8 chars)
+- name : str
+- email : str
+- password : str
+- product_id : str (UUID format, 8 chars)
+- product_name : str
+- price : float
+- stock : int
+- category : str
+- quantity : int
+- total_amount : float
+- order_status : str (Pending/Paid/Delivered/Cancelled)
+- payment_status : str (Completed/Failed/Pending)
+- payment_mode : str (Credit Card/Debit Card/Net Banking/COD)
+
+DATA STRUCTURES:
+----------------
+- List : products, orders, cart items, wishlist items
+- Dictionary : user records, product details, order details
+- Set : unique product categories
+- Tuple : PRODUCT_CATEGORIES (fixed specifications)
+
+================================================================================
+PYTHON CONCEPTS IMPLEMENTED:
+================================================================================
+
+BASIC PYTHON:
+-------------
+✓ Variables and Data Types
+✓ Operators
+✓ Conditional Statements
+✓ Loops (for, while)
+
+FUNCTIONS:
+----------
+✓ User Defined Functions
+✓ Recursive Function (recursive_search_by_category)
+✓ Lambda Functions (sort products by price, orders by date)
+
+DATA STRUCTURES:
+----------------
+✓ List (products, orders)
+✓ Dictionary (user data, product details)
+✓ Set (unique categories)
+✓ Tuple (PRODUCT_CATEGORIES)
+
+ADVANCED CONCEPTS:
+------------------
+✓ List Comprehension (get_products_in_stock)
+✓ Decorators (log_action, login_required, handle_exceptions)
+✓ Generators (invoice_generator)
+✓ Modules (separate Python files)
+
+OOP CONCEPTS:
+-------------
+✓ Classes and Objects
+✓ Constructor (__init__ in all classes)
+✓ Encapsulation (private data in storage)
+✓ Inheritance (Electronics, Clothing from Product)
+✓ Polymorphism (display_product, calculate_discount)
+✓ Abstraction (Product abstract class)
+✓ Composition (Store contains all data)
+✓ Static Methods (TaxCalculator.calculate_tax)
+✓ Class Methods (SalesStatistics.update_statistics)
+✓ Magic Methods (__str__, __repr__ in product classes)
+
+FILE HANDLING:
+--------------
+✓ JSON Files (users, products, carts, wishlists, orders, payments, invoices)
+✓ CSV Files (sales reports, order reports, inventory reports)
+
+EXCEPTION HANDLING:
+-------------------
+✓ InvalidProductIDError
+✓ InvalidLoginError
+✓ ProductOutOfStockError
+✓ InvalidPaymentAmountError
+✓ DuplicateUserError
+✓ FileNotFoundError
+✓ InvalidInputError
+
+DATE AND TIME:
+--------------
+✓ datetime module for order date, payment date, invoice generation
+
+================================================================================
+HOW TO RUN THE PROJECT:
+================================================================================
+
+1. Save all files in the ecommerce_portal directory
+2. Open terminal in the project directory
+3. Run: python main.py
+4. Follow the menu options
+
+FIRST TIME USAGE:
+-----------------
+1. Register a new user account
+2. Login with your credentials
+3. Add some products (admin can add products)
+4. Add products to cart
+5. Place order and make payment
+6. Generate invoice and reports
+
+DEFAULT DATA:
+-------------
+The system starts with empty data. You need to add products first.
+
+================================================================================
+FILE PATHS FOR DATA STORAGE:
+================================================================================
+
+JSON Files:
+-----------
+./data/users.json         - All user accounts
+./data/products.json      - Product inventory
+./data/carts.json         - Shopping cart data
+./data/wishlists.json     - Wishlist data
+./data/orders.json        - Order records
+./data/payments.json      - Payment transactions
+./data/invoices.json      - Invoice records
+
+CSV Reports:
+------------
+./reports/sales_report.csv      - Sales summary
+./reports/order_report.csv      - Order details
+./reports/inventory_report.csv  - Product inventory
+
+================================================================================
+END OF DOCUMENTATION
+================================================================================
+
+================================================================================
+         E-COMMERCE SHOPPING PORTAL - COMPLETE PROJECT EXPLANATION
+================================================================================
+
+PROJECT OVERVIEW
+================================================================================
+This is a complete terminal-based E-Commerce Shopping Portal that allows users
+to register, browse products, add items to cart/wishlist, place orders, make
+payments, generate invoices, and view reports. All data is stored in JSON files.
+
+================================================================================
+PROJECT STRUCTURE (8 Modules)
+================================================================================
+
+ecommerce_portal/
+│
+├── main.py                 # Main application - handles menu & user flow
+├── user_management.py      # User registration, login, profile management
+├── product_management.py   # Product CRUD operations, search functionality
+├── cart_wishlist.py        # Shopping cart & wishlist management
+├── order_payment.py        # Order placement, cancellation, payment processing
+├── invoice_reports.py      # Invoice generation & CSV report creation
+├── data_storage.py         # JSON file handling (save/load data)
+├── utils.py                # Decorators, helper functions, exceptions
+│
+├── data/                   # JSON data storage (auto-created)
+│   ├── users.json         # User accounts
+│   ├── products.json      # Product inventory
+│   ├── carts.json         # Shopping cart data
+│   ├── wishlists.json     # Wishlist data
+│   ├── orders.json        # Order records
+│   ├── payments.json      # Payment transactions
+│   └── invoices.json      # Invoice records
+│
+└── reports/               # CSV reports (auto-created)
+    ├── sales_report.csv
+    ├── order_report.csv
+    └── inventory_report.csv
+
+
+================================================================================
+MODULE 1: main.py - Main Application
+================================================================================
+
+CLASS: EcommercePortal (Main controller class)
+
+Purpose: Orchestrates all other modules and handles user interface
+
+ATTRIBUTES:
+- storage : DataStorage object
+- user_manager : UserManager object
+- product_manager : ProductManager object
+- cart_manager : CartManager object
+- wishlist_manager : WishlistManager object
+- order_manager : OrderManager object
+- payment_manager : PaymentManager object
+- invoice_manager : InvoiceManager object
+- report_generator : ReportGenerator object
+- current_user : Currently logged in user (dict)
+
+METHODS:
+- __init__() : Initializes all managers
+- register_user() : Handles new user registration
+- login_user() : Authenticates user login
+- view_profile() : Displays current user profile
+- view_order_history() : Shows all orders by current user
+- view_all_products() : Displays complete product catalog
+- add_product() : Adds new product to inventory (Admin)
+- add_to_cart() : Adds product to shopping cart
+- view_cart() : Displays current cart contents
+- add_to_wishlist() : Adds product to wishlist
+- view_wishlist() : Displays wishlist contents
+- place_order() : Places order and processes payment
+- track_order() : Checks order status
+- cancel_order() : Cancels existing order
+- view_order_details() : Shows detailed order information
+- generate_invoice() : Creates invoice for order
+- save_data() : Saves all data to JSON files
+- load_data() : Loads all data from JSON files
+- run() : Main program loop with menu system
+- wait_for_user() : Pauses program until Enter key pressed
+
+
+================================================================================
+MODULE 2: user_management.py - User Management
+================================================================================
+
+CLASS: UserManager
+
+Purpose: Handles all user-related operations
+
+ATTRIBUTES:
+- storage : DataStorage object
+
+METHODS:
+- register(name, email, password) : Creates new user account
+  - Checks if email already exists
+  - Generates unique user_id (8 chars)
+  - Saves user to users.json
+  - Returns user_id
+
+- login(email, password) : Authenticates user
+  - Searches for matching email and password
+  - Returns user object if found, None otherwise
+
+- update_password(email, old_pass, new_pass) : Changes user password
+  - Verifies old password
+  - Updates if correct
+
+- get_user(user_id) : Retrieves user by ID
+
+USER DATA STRUCTURE:
+{
+    "user_id": "a1b2c3d4",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "registered_date": "2024-01-15 14:30:22",
+    "order_history": ["order_id1", "order_id2"]
+}
+
+
+================================================================================
+MODULE 3: product_management.py - Product Management
+================================================================================
+
+CLASSES:
+
+1. Product (Abstract Base Class)
+   - Abstract methods: display_product(), calculate_discount()
+   - Regular method: update_stock()
+
+2. Electronics (Inherits from Product)
+   - Additional attributes: brand, warranty, model
+   - 10% discount on all electronics
+
+3. Clothing (Inherits from Product)
+   - Additional attributes: size, color, material
+   - 20% discount on all clothing
+
+4. ProductManager (Main product handler)
+
+ProductManager METHODS:
+- add_product(name, price, stock, category) : Adds new product
+  - Uses sequential IDs: 101, 102, 103...
+  - Saves to products.json
+
+- update_product(product_id) : Modifies existing product
+
+- delete_product(product_id) : Removes product from inventory
+
+- search_products(keyword) : Finds products by name or category
+
+- recursive_search_by_category(category) : Uses recursion to find products
+
+- get_all_products() : Returns complete product list
+
+- get_product(product_id) : Returns specific product
+
+- update_stock(product_id, quantity) : Reduces stock after purchase
+
+PRODUCT DATA STRUCTURE:
+{
+    "product_id": "101",
+    "name": "Laptop",
+    "price": 89999,
+    "stock": 10,
+    "category": "Electronics",
+    "brand": null,
+    "size": null
+}
+
+
+================================================================================
+MODULE 4: cart_wishlist.py - Cart & Wishlist Management
+================================================================================
+
+CLASSES:
+
+1. CartManager - Shopping cart operations
+
+METHODS:
+- get_cart(user_id) : Retrieves or creates user's cart
+- add_to_cart(user_id, product_id, quantity) : Adds item to cart
+- remove_from_cart(user_id, product_id) : Removes item
+- update_quantity(user_id, product_id, quantity) : Changes quantity
+- clear_cart(user_id) : Empties cart after order
+
+2. WishlistManager - Wishlist operations
+
+METHODS:
+- get_wishlist(user_id) : Retrieves or creates wishlist
+- add_to_wishlist(user_id, product_id) : Adds to wishlist
+- remove_from_wishlist(user_id, product_id) : Removes from wishlist
+- move_to_cart(user_id, product_id, cart_manager) : Moves item to cart
+
+CART DATA STRUCTURE:
+{
+    "cart_id": "cart123",
+    "user_id": "a1b2c3d4",
+    "products": [
+        {
+            "product_id": "101",
+            "name": "Laptop",
+            "price": 89999,
+            "quantity": 1,
+            "subtotal": 89999
+        }
+    ],
+    "total_amount": 89999
+}
+
+WISHLIST DATA STRUCTURE:
+{
+    "wishlist_id": "wish123",
+    "user_id": "a1b2c3d4",
+    "products": [
+        {
+            "product_id": "102",
+            "name": "Mouse",
+            "price": 1299
+        }
+    ]
+}
+
+
+================================================================================
+MODULE 5: order_payment.py - Order & Payment Management
+================================================================================
+
+CLASSES:
+
+1. OrderManager - Order operations
+
+METHODS:
+- place_order(user_id, cart, payment_mode) : Creates new order
+  - Generates order_id
+  - Updates product stock
+  - Saves order to orders.json
+  - Updates user's order history
+
+- cancel_order(order_id, user_id) : Cancels if not delivered
+
+- track_order(order_id, user_id) : Returns order status
+
+- get_order_details(order_id, user_id) : Returns full order info
+
+- get_user_orders(user_id) : Returns all user's orders
+
+2. PaymentManager - Payment operations
+
+METHODS:
+- process_payment(order_id, amount, payment_mode) : Processes payment
+- verify_payment(payment_id) : Checks payment status
+- generate_receipt(payment_id) : Creates payment receipt
+- get_payment_history(user_id) : Returns user's payment history
+
+ORDER DATA STRUCTURE:
+{
+    "order_id": "ord12345",
+    "user_id": "a1b2c3d4",
+    "products": [...],
+    "order_date": "2024-01-15 14:30:22",
+    "order_status": "Paid",
+    "total_amount": 89999,
+    "payment_mode": "Credit Card"
+}
+
+PAYMENT DATA STRUCTURE:
+{
+    "payment_id": "pay67890",
+    "order_id": "ord12345",
+    "payment_mode": "Credit Card",
+    "payment_status": "Completed",
+    "amount": 89999,
+    "payment_date": "2024-01-15 14:30:25"
+}
+
+
+================================================================================
+MODULE 6: invoice_reports.py - Invoice & Reports
+================================================================================
+
+CLASSES:
+
+1. InvoiceManager - Invoice operations
+
+METHODS:
+- generate_invoice(order_id, order) : Creates invoice
+- get_invoice(invoice_id) : Retrieves invoice
+- get_order_invoice(order_id) : Finds invoice by order
+- export_invoice(invoice) : Saves invoice to CSV
+
+2. ReportGenerator - CSV report creation
+
+METHODS:
+- generate_sales_report() : Creates sales_report.csv
+  - Total sales amount
+  - Order status breakdown
+  - Recent orders list
+
+- generate_order_report() : Creates order_report.csv
+  - All orders with details
+  - User ID, date, amount, status
+
+- generate_inventory_report() : Creates inventory_report.csv
+  - All products with stock levels
+  - Total inventory value
+  - Low stock items (<10 units)
+
+INVOICE DATA STRUCTURE:
+{
+    "invoice_id": "inv11111",
+    "order_id": "ord12345",
+    "invoice_date": "2024-01-15 14:30:28",
+    "total_amount": 89999,
+    "products": [...],
+    "user_id": "a1b2c3d4"
+}
+
+
+================================================================================
+MODULE 7: data_storage.py - File Storage
+================================================================================
+
+CLASS: DataStorage
+
+Purpose: Handles all JSON file operations
+
+METHODS:
+- load_users() / save_users(users)
+- load_products() / save_products(products)
+- load_carts() / save_carts(carts)
+- load_wishlists() / save_wishlists(wishlists)
+- load_orders() / save_orders(orders)
+- load_payments() / save_payments(payments)
+- load_invoices() / save_invoices(invoices)
+- update_product_stock(product_id, quantity)
+- ensure_data_directory() : Creates data folder and files if missing
+
+Each method handles FileNotFoundError and JSON decode errors gracefully.
+
+
+================================================================================
+MODULE 8: utils.py - Utilities
+================================================================================
+
+DECORATORS:
+
+1. @login_required
+   - Checks if user is logged in before executing function
+   - Shows error message if not logged in
+
+2. @log_action
+   - Logs function name and timestamp before/after execution
+
+3. @handle_exceptions
+   - Catches and handles common exceptions
+
+EXCEPTION CLASSES:
+- InvalidProductIDError
+- InvalidLoginError
+- ProductOutOfStockError
+- InvalidPaymentAmountError
+- DuplicateUserError
+- FileNotFoundError
+- InvalidInputError
+
+UTILITY CLASSES:
+
+1. TaxCalculator (Static Methods)
+   - calculate_tax(amount, tax_rate)
+   - calculate_total_with_tax(amount, tax_rate)
+
+2. SalesStatistics (Class Methods)
+   - update_statistics(amount)
+   - get_statistics()
+
+GENERATOR FUNCTION:
+- invoice_generator(invoices) : Yields invoices one at a time
+
+HELPER FUNCTION:
+- get_products_in_stock(products) : Uses list comprehension
+
+
+================================================================================
+COMPLETE CLASS SUMMARY (Total: 12 Classes)
+================================================================================
+
+MAIN APPLICATION:
+1. EcommercePortal - Main controller
+
+USER MANAGEMENT:
+2. UserManager - User operations
+
+PRODUCT MANAGEMENT:
+3. Product (Abstract)
+4. Electronics (Inherits Product)
+5. Clothing (Inherits Product)
+6. ProductManager - Product operations
+
+CART & WISHLIST:
+7. CartManager - Cart operations
+8. WishlistManager - Wishlist operations
+
+ORDER & PAYMENT:
+9. OrderManager - Order operations
+10. PaymentManager - Payment operations
+
+INVOICE & REPORTS:
+11. InvoiceManager - Invoice operations
+12. ReportGenerator - CSV report generation
+
+STORAGE:
+13. DataStorage - File operations
+
+UTILITIES:
+14. TaxCalculator (Static)
+15. SalesStatistics (Class methods)
+
+
+================================================================================
+PYTHON CONCEPTS IMPLEMENTED
+================================================================================
+
+BASIC PYTHON:
+✓ Variables and Data Types (str, int, float, list, dict, bool)
+✓ Operators (arithmetic, comparison, logical)
+✓ Conditional Statements (if, elif, else)
+✓ Loops (for, while)
+
+FUNCTIONS:
+✓ User Defined Functions
+✓ Recursive Function (recursive_search_by_category)
+✓ Lambda Functions (sorting products/orders)
+
+DATA STRUCTURES:
+✓ List (products, orders, cart items)
+✓ Dictionary (user data, product details)
+✓ Set (unique categories)
+✓ Tuple (fixed specifications - PRODUCT_CATEGORIES)
+
+ADVANCED PYTHON:
+✓ List Comprehension (get_products_in_stock)
+✓ Decorators (@login_required, @log_action, @handle_exceptions)
+✓ Generators (invoice_generator)
+✓ Modules (separate Python files)
+
+OBJECT-ORIENTED PROGRAMMING:
+✓ Classes and Objects (12+ classes)
+✓ Constructor (__init__ in every class)
+✓ Encapsulation (data hidden in storage)
+✓ Inheritance (Electronics, Clothing from Product)
+✓ Polymorphism (display_product, calculate_discount)
+✓ Abstraction (Product abstract class)
+✓ Composition (Store contains all data objects)
+✓ Static Methods (TaxCalculator)
+✓ Class Methods (SalesStatistics)
+✓ Magic Methods (__str__, __repr__)
+
+FILE HANDLING:
+✓ JSON Files (all data storage)
+✓ CSV Files (reports generation)
+
+EXCEPTION HANDLING:
+✓ InvalidProductIDError
+✓ InvalidLoginError
+✓ ProductOutOfStockError
+✓ InvalidPaymentAmountError
+✓ DuplicateUserError
+✓ FileNotFoundError
+✓ InvalidInputError
+
+DATE AND TIME:
+✓ datetime module (order date, payment date, invoice generation)
+
+
+================================================================================
+HOW THE PROGRAM WORKS - STEP BY STEP FLOW
+================================================================================
+
+1. PROGRAM START
+   - main.py executes
+   - Creates EcommercePortal object
+   - Calls run() method
+
+2. INITIALIZATION
+   - Creates data/ folder if missing
+   - Creates all JSON files if missing
+   - Loads existing data from JSON files
+   - Adds sample products if none exist (15 products with IDs 101-115)
+
+3. USER INTERACTION LOOP
+   - Displays menu
+   - Takes user input
+   - Calls appropriate method based on choice
+
+4. USER REGISTRATION FLOW
+   - User enters name, email, password
+   - UserManager.register() creates user_id
+   - Saves to users.json
+   - Shows success message
+
+5. USER LOGIN FLOW
+   - User enters email and password
+   - UserManager.login() validates credentials
+   - Stores current_user object
+   - Shows welcome message
+
+6. PRODUCT VIEWING FLOW
+   - User selects "View All Products"
+   - ProductManager.get_all_products() loads from products.json
+   - Displays formatted table with IDs, names, prices, stock, category
+
+7. ADD TO CART FLOW
+   - User sees all products
+   - Enters product_id and quantity
+   - CartManager checks stock availability
+   - Adds to cart or shows error
+   - Updates carts.json
+
+8. PLACE ORDER FLOW
+   - User confirms cart contents
+   - Selects payment method
+   - OrderManager.place_order() creates order
+   - Updates product stock
+   - PaymentManager.process_payment() processes payment
+   - InvoiceManager.generate_invoice() creates invoice
+   - Clears cart
+   - Shows order confirmation
+
+9. ORDER TRACKING FLOW
+   - User enters order_id
+   - OrderManager.track_order() returns status
+   - Shows current status (Pending/Paid/Delivered/Cancelled)
+
+10. INVOICE GENERATION FLOW
+    - User enters order_id
+    - InvoiceManager generates invoice
+    - Shows invoice details
+    - Option to export to CSV
+
+11. REPORT GENERATION FLOW
+    - User selects report type
+    - ReportGenerator reads data from JSON files
+    - Creates CSV file in reports/ folder
+    - Shows completion message
+
+12. DATA PERSISTENCE
+    - All changes automatically saved to JSON files
+    - On exit, final save ensures data integrity
+    - Next run loads all previous data
+
+
+================================================================================
+SAMPLE USER JOURNEY
+================================================================================
+
+1. Register:
+   Name: Raj Sharma
+   Email: raj@example.com
+   Password: raj123
+
+2. Login:
+   Email: raj@example.com
+   Password: raj123
+
+3. View Products:
+   Shows 15 products with IDs 101-115
+
+4. Add to Cart:
+   Add product 106 (Doraemon Plush Toy) - quantity 2
+   Add product 110 (Pikachu Backpack) - quantity 1
+
+5. View Cart:
+   Shows: Doraemon Plush Toy x2 = ₹2998
+          Pikachu Backpack x1 = ₹3499
+          Total: ₹6497
+
+6. Place Order:
+   Confirm order
+   Select payment: Credit Card
+   Order placed! Order ID: ord12345
+   Payment processed! Payment ID: pay67890
+   Invoice generated! Invoice ID: inv11111
+
+7. Track Order:
+   Enter order_id: ord12345
+   Status: Paid
+
+8. View Order History:
+   Shows order with date, status, total amount
+
+9. Generate Invoice:
+   Enter order_id: ord12345
+   Invoice displayed with all details
+
+10. Logout/Exit
+
+
+================================================================================
+FILE STRUCTURE SUMMARY
+================================================================================
+
+TOTAL FILES: 8 Python files + 7 JSON files + 3 CSV files
+
+PYTHON FILES (8):
+1. main.py - 350+ lines
+2. user_management.py - 80+ lines
+3. product_management.py - 200+ lines
+4. cart_wishlist.py - 200+ lines
+5. order_payment.py - 180+ lines
+6. invoice_reports.py - 180+ lines
+7. data_storage.py - 150+ lines
+8. utils.py - 100+ lines
+
+TOTAL CODE: ~1500 lines
+
+DATA FILES (Auto-created):
+- users.json
+- products.json
+- carts.json
+- wishlists.json
+- orders.json
+- payments.json
+- invoices.json
+
+REPORT FILES (Auto-created):
+- sales_report.csv
+- order_report.csv
+- inventory_report.csv
+
+
+================================================================================
+KEY FEATURES IMPLEMENTED
+================================================================================
+
+✅ User Management (Register, Login, Profile, Password Update)
+✅ Product Management (Add, Update, Delete, Search, View)
+✅ Shopping Cart (Add, Remove, Update Quantity, View, Calculate Total)
+✅ Wishlist (Add, Remove, Move to Cart)
+✅ Order Management (Place, Cancel, Track, View Details)
+✅ Payment Processing (Multiple Modes, Validation, Receipt)
+✅ Invoice Generation (Create, View, Export to CSV)
+✅ Reports (Sales, Order, Inventory - CSV format)
+✅ Data Persistence (JSON for all data)
+✅ Exception Handling (All edge cases covered)
+✅ Sequential Product IDs (101, 102, 103...)
+✅ Indian Rupee Currency (₹)
+✅ 15 Sample Products including Doraemon, Pikachu, Anime items
+
+
+================================================================================
+HOW TO RUN THE PROJECT
+================================================================================
+
+1. Save all Python files in ecommerce_portal folder
+2. Open terminal in project directory
+3. Run: python main.py
+4. Follow menu options
+5. First time: Register new user
+6. Login with credentials
+7. Start shopping!
+
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Problem: Random IDs instead of sequential
+Solution: Delete data/ folder and restart
+
+Problem: Products not showing
+Solution: Delete data/ folder and restart
+
+Problem: Login fails
+Solution: Register again after deleting data/ folder
+
+Problem: Cart not clearing
+Solution: Check if order was placed successfully
+
+Problem: Invoice not generating
+Solution: Ensure order exists and is paid
+
+
+================================================================================
+END OF DOCUMENTATION
+================================================================================

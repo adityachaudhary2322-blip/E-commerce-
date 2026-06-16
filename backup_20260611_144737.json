@@ -1,0 +1,55 @@
+{
+  "products": [
+    {
+      "id": "101",
+      "name": "Gaming Laptop",
+      "price": 89999,
+      "stock": 10,
+      "category": "Electronics",
+      "image": "\ud83d\udcbb"
+    },
+    {
+      "id": "102",
+      "name": "Wireless Mouse",
+      "price": 1299,
+      "stock": 50,
+      "category": "Electronics",
+      "image": "\ud83d\uddb1\ufe0f"
+    },
+    {
+      "id": "103",
+      "name": "Cotton T-Shirt",
+      "price": 999,
+      "stock": 100,
+      "category": "Clothing",
+      "image": "\ud83d\udc55"
+    },
+    {
+      "id": "106",
+      "name": "Doraemon Plush Toy",
+      "price": 1499,
+      "stock": 25,
+      "category": "Toys",
+      "image": "\ud83d\udc31"
+    },
+    {
+      "id": "109",
+      "name": "Pikachu Soft Toy",
+      "price": 1999,
+      "stock": 20,
+      "category": "Toys",
+      "image": "\ud83d\udc2d"
+    },
+    {
+      "id": "112",
+      "name": "Niet Anime Bag",
+      "price": 4499,
+      "stock": 10,
+      "category": "Bags",
+      "image": "\ud83c\udf92"
+    }
+  ],
+  "orders": [],
+  "users": [],
+  "backup_date": "2026-06-11T14:47:37.049653"
+}
